@@ -4,9 +4,21 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^25.0.10"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "glob": "^13.0.0",
+    "ignore": "^7.0.5",
+    "inquirer": "^13.2.1",
+    "marked": "^17.0.1",
+    "marked-terminal": "^7.3.0",
+    "ora": "^9.1.0",
+    "table": "^6.9.0"
   }
 }
