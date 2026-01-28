@@ -1,8 +1,19 @@
 {
   "name": "scry",
-  "module": "index.ts",
+  "version": "0.1.0",
+  "description": "Security-focused CLI that reveals hidden risks in JavaScript and Node.js codebases",
   "type": "module",
-  "private": true,
+  "main": "dist/index.js",
+  "bin": {
+    "scry": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/cli/index.ts --outdir dist --format esm",
+    "dev": "bun run src/cli/index.ts",
+    "scan": "bun run src/cli/index.ts scan",
+    "test": "bun test",
+    "type-check": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^25.0.10"
