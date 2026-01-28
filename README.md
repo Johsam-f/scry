@@ -1,2 +1,197 @@
 # scry
+
 a command line tool to help develops avoid common mistakes
+
+# scry
+
+**A security-focused CLI that reveals hidden risks in JavaScript and Node.js codebases.**
+
+> In fantasy, _to scry_ means to reveal hidden truths. `scry` applies the same idea to code.
+
+## What is scry?
+
+**scry** is a command-line security scanner that detects common but dangerous security mistakes in JavaScript/TypeScript projects and provides:
+
+✅ **Clear explanations** of why each issue is risky  
+✅ **Actionable fixes** with code examples  
+✅ **Educational context** to build security awareness  
+✅ **Fast, focused scanning** without overwhelming noise
+
+## Quick Start
+
+```bash
+# Install (coming soon to npm)
+bun install scry
+
+# Scan current directory
+scry scan .
+
+# Scan specific path
+scry scan ./src
+
+# Strict mode (exit code 1 if issues found)
+scry scan . --strict
+
+# Output as JSON
+scry scan . --output json
+```
+
+## What scry Detects
+
+### Security Rules
+
+1. **Hardcoded Secrets** 🔐 - API keys, tokens, passwords, AWS credentials
+2. **JWT in Client Storage** ⚠️ - JWT tokens in localStorage/sessionStorage
+3. **Insecure Cookies** 🍪 - Missing httpOnly, secure, sameSite flags
+4. **eval() Usage** ☠️ - Dangerous code execution
+5. **CORS Misconfiguration** - Overly permissive CORS
+6. **.env Exposure** - Environment files in version control
+7. **Weak Cryptography** - MD5, SHA1, unsalted hashing
+8. **Password Patterns** - Weak password handling
+
+## Example Output
+
+```
+┌──────────┬────────────────────┬─────────────────┬──────┬──────────────────────┐
+│ Severity │ Rule               │ File            │ Line │ Message              │
+├──────────┼────────────────────┼─────────────────┼──────┼──────────────────────┤
+│ ●●● HIGH │ hardcoded-secrets  │ src/config.ts   │ 14   │ Hardcoded API key    │
+│ ●●● HIGH │ jwt-storage        │ src/auth.ts     │ 28   │ JWT in localStorage  │
+│ ●● MEDIUM│ cors-config        │ src/server.ts   │ 45   │ Permissive CORS      │
+└──────────┴────────────────────┴─────────────────┴──────┴──────────────────────┘
+
+Summary:
+Files scanned: 847
+Duration: 2.3s
+
+Results:
+●●● High: 3
+●● Medium: 6
+● Low: 3
+Total: 12
+```
+
+## Installation
+
+```bash
+# From source
+git clone https://github.com/johsam/scry.git
+cd scry
+bun install
+bun run dev scan .
+
+# From npm (coming soon)
+npm install -g scry
+scry scan .
+```
+
+## Usage
+
+### Basic Scanning
+
+```bash
+# Current directory
+scry scan
+
+# Specific path
+scry scan ./src
+
+# Multiple paths
+scry scan ./src ./tests
+```
+
+### Output Formats
+
+```bash
+# Table (default)
+scry scan . --output table
+
+# JSON for CI/CD integration
+scry scan . --output json > results.json
+
+# Markdown for reports
+scry scan . --output markdown
+```
+
+### Filter by Severity
+
+```bash
+# Only show high severity issues
+scry scan . --min-severity high
+
+# Show all issues
+scry scan . --min-severity low
+```
+
+### Strict Mode
+
+```bash
+# Fail with exit code 1 if any issues found
+scry scan . --strict
+```
+
+## Configuration
+
+Create `.scryrc.json` in your project root:
+
+```json
+{
+  "rules": {
+    "hardcoded-secrets": "error",
+    "eval-usage": "error",
+    "jwt-storage": "error",
+    "cookie-security": "warn"
+  },
+  "ignore": ["**/tests/**", "**/fixtures/**", "**/mocks/**"],
+  "extensions": [".js", ".ts", ".jsx", ".tsx"],
+  "strict": false,
+  "minSeverity": "low",
+  "showFixes": true,
+  "showExplanations": true
+}
+```
+
+## Why scry?
+
+Modern developers ship code fast, often faster than they can think about security.
+
+While powerful tools like linters exist, many:
+
+- Focus on rules without context
+- Assume prior security knowledge
+- Overwhelm with noise
+
+**scry is different:**
+
+- Opinionated, not exhaustive
+- Educational, not noisy
+- Focused on real-world security footguns
+
+## Contributing
+
+Contributions welcome! Areas to help:
+
+- [ ] Add more security rules
+- [ ] Framework-specific rules (React, Vue, Angular)
+- [ ] VS Code extension
+- [ ] CI/CD integrations
+- [ ] Better regex patterns
+- [ ] Documentation improvements
+
+## License
+
+MIT
+
+## Built with
+
+- **TypeScript** - Type safety
+- **Bun** - Fast runtime
+- **Commander.js** - CLI framework
+- **Chalk** - Terminal colors
+- **Glob** - File matching
+
+---
+
+**Built for the GitHub Copilot CLI Challenge**
+
+Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/COPILOT_USAGE.md](docs/COPILOT_USAGE.md)
