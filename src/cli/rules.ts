@@ -3,11 +3,13 @@
 import type { Rule } from '../types';
 import { HardcodedSecretsRule } from '../rules/hardcodedSecrets';
 import { JWTStorageRule } from '../rules/jwtStorage';
+import { EvalUsageRule } from '../rules/evalUsage';
 
 export function getAllRules(): Rule[] {
   return [
     new HardcodedSecretsRule(),
-    new JWTStorageRule()
+    new JWTStorageRule(),
+    new EvalUsageRule()
   ];
 }
 
