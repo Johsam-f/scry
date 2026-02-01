@@ -67,20 +67,17 @@ This ensures the count reflects the actual number of files that were processed.
 
 ## Verification
 
-**Before Fix:**
+### Before Fix
 
-```bash
-$ bun scan examples
-Files scanned: 0
-```
+The scanner was incorrectly displaying 0 files scanned:
 
-**After Fix:**
+![Before Fix Screenshot](./before-fix.png)
 
-```bash
-$ bun scan examples
-Scan complete. Found X issues.
-Files scanned: 42
-```
+### After Fix
+
+The scanner now correctly displays the actual number of files scanned:
+
+![After Fix Screenshot](./after-fix.png)
 
 The output now correctly displays the number of files that were actually scanned.
 
@@ -97,7 +94,11 @@ The output now correctly displays the number of files that were actually scanned
 
 ## Copilot CLI Assistance
 
-**Query Used:**
+### Prompt Used
+
+![Copilot Prompt Screenshot](./prompt.png)
+
+**Actual Query:**
 
 ```bash
 " can you help me check the bug which is resnposible for checking the number of files scanned.. because it
@@ -110,6 +111,10 @@ The output now correctly displays the number of files that were actually scanned
 - Check if the return object property names match what's being displayed
 - Verify the files array is being counted correctly
 - Ensure the return statement includes the correct calculation
+
+### AI Solution
+
+![AI Solution Screenshot](./AI-solution.png)
 
 ---
 
