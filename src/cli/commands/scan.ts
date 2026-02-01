@@ -22,11 +22,11 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
 
     // Run scan
     const startTime = Date.now();
-    const findings = await scanner.scan(path);
+    const result = await scanner.scan(path);
     const duration = Date.now() - startTime;
 
     // Render output
-    const output = render(findings, 0, duration, {
+    const output = render(result.findings, result.filesScanned, duration, {
       format: config.output,
       showSummary: true,
       showExplanations: true,
@@ -36,7 +36,7 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
     console.log(output);
 
     // Exit with error code if strict mode and findings exist
-    if (config.strict && findings.length > 0) {
+    if (config.strict && result.findings.length > 0) {
       process.exit(1);
     }
   } catch (error) {

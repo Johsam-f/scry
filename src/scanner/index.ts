@@ -15,7 +15,7 @@ export class Scanner {
   }
 
   // Scan a directory for security issues
-  async scan(path: string): Promise<Finding[]> {
+  async scan(path: string): Promise<{ findings: Finding[]; filesScanned: number }> {
     const spinner = ora('Scanning files...').start();
 
     try {
@@ -55,7 +55,10 @@ export class Scanner {
 
       spinner.succeed(`Scan complete. Found ${allFindings.length} issues.`);
 
-      return allFindings;
+      return {
+        findings: allFindings,
+        filesScanned: files.length
+      };
     } catch (error) {
       spinner.fail(`Scan failed: ${error}`);
       throw error;
