@@ -27,6 +27,7 @@
     "glob": "^13.0.0",
     "ignore": "^7.0.5",
     "inquirer": "^13.2.1",
+    "log-symbols": "^7.0.1",
     "marked": "^17.0.1",
     "marked-terminal": "^7.3.0",
     "ora": "^9.1.0",
