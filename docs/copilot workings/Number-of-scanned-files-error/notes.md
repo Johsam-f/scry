@@ -71,13 +71,13 @@ This ensures the count reflects the actual number of files that were processed.
 
 The scanner was incorrectly displaying 0 files scanned:
 
-![Before Fix Screenshot](./before-fix.png)
+![Before Fix Screenshot](./screenshots/before-fix.png)
 
 ### After Fix
 
 The scanner now correctly displays the actual number of files scanned:
 
-![After Fix Screenshot](./after-fix.png)
+![After Fix Screenshot](./screenshots/after-fix.png)
 
 The output now correctly displays the number of files that were actually scanned.
 
@@ -96,7 +96,7 @@ The output now correctly displays the number of files that were actually scanned
 
 ### Prompt Used
 
-![Copilot Prompt Screenshot](./prompt.png)
+![Copilot Prompt Screenshot](./screenshots/prompt.png)
 
 **Actual Query:**
 
@@ -114,7 +114,7 @@ The output now correctly displays the number of files that were actually scanned
 
 ### AI Solution
 
-![AI Solution Screenshot](./AI-solution.png)
+![AI Solution Screenshot](./screenshots/AI-solution.png)
 
 ---
 
