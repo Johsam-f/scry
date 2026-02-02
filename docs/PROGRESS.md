@@ -1,7 +1,9 @@
 # scry Development Progress
 
+**Challenge:** GitHub Copilot CLI Challenge 2026  
+**Challenge URL:** https://dev.to/challenges/github-2026-01-21  
 **Challenge Deadline:** February 15, 2026 at 11:59 PM PST  
-**Days Remaining:** ~18 days  
+**Days Remaining:** ~13 days  
 **Start Date:** January 28, 2026
 
 ---
@@ -61,6 +63,19 @@
 ---
 
 ## Week 3: Polish & Submission (Feb 11 - Feb 15)
+
+### Submission Checklist (REQUIRED)
+
+- [ ] **DEV.to post written** with Copilot CLI showcase
+  - What I built
+  - How I used Copilot CLI (with examples & screenshots)
+  - Features implemented
+  - How to use scry
+  - GitHub repo link
+- [ ] **Screenshots of Copilot CLI usage** (5+ sessions documented)
+- [ ] **Working demo** with vulnerable code samples
+- [ ] **GitHub repo public** with clear README
+- [ ] **Post published** with tags: `devchallenge,githubchallenge,cli,githubcopilot`
 
 ### Day 15-16: Documentation & Video
 
