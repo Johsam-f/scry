@@ -80,6 +80,33 @@
 
 ## Copilot CLI Usage Log
 
+### Implementation Workflow
+
+**How to use Copilot CLI while implementing features:**
+
+1. **For understanding requirements:**
+
+   ```bash
+   gh copilot explain "What is a secure cookie flag?"
+   ```
+
+2. **For code generation:**
+
+   ```bash
+   gh copilot suggest "Generate a function to check cookie security flags in TypeScript"
+   ```
+
+3. **For debugging:**
+
+   ```bash
+   gh copilot explain "What does this regex do: /password\s*[:=]\s*['\"].*['\"]/"
+   ```
+
+4. **For test generation:**
+   ```bash
+   gh copilot suggest "Create unit tests for cookie security check in Jest"
+   ```
+
 ### Sessions
 
 Record each time GitHub Copilot CLI helps with development:
@@ -102,13 +129,21 @@ Record each time GitHub Copilot CLI helps with development:
 
 ## Metrics to Track
 
-- **Total LOC written:** ~1500+
-- **Security rules implemented:** 2 / 8
+- **Total LOC written:** ~1500+ → TARGET: +1000 more
+- **Security rules implemented:** 2 / 8 → TARGET: 7/8 by Feb 10
 - **Test coverage:** In progress
 - **Files scanned capability:** ✅ Works with glob patterns
 - **False positive rate:** TBD
-- **Copilot CLI sessions:** 0
-- **Time saved with Copilot:** 0 hours
+- **Copilot CLI sessions:** 0 → Tracking here ⬇️
+- **Time saved with Copilot:** 0 hours → Tracking here ⬇️
+
+### Remaining Features to Implement (Week 2)
+
+1. **Cookie security flags** - Check for Secure, HttpOnly, SameSite
+2. **CORS configuration** - Detect overly permissive CORS
+3. **`.env` exposure** - Find committed environment files
+4. **Weak crypto** - Identify insecure hash/encryption methods
+5. **Password patterns** - Check for weak password handling
 
 ---
 

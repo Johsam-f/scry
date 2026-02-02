@@ -1,9 +1,5 @@
 # scry
 
-a command line tool to help develops avoid common mistakes
-
-# scry
-
 **A security-focused CLI that reveals hidden risks in JavaScript and Node.js codebases.**
 
 > In fantasy, _to scry_ means to reveal hidden truths. `scry` applies the same idea to code.
@@ -194,4 +190,4 @@ MIT
 
 **Built for the GitHub Copilot CLI Challenge**
 
-Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/COPILOT_USAGE.md](docs/COPILOT_USAGE.md)
+Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/screenshots](docs/screenshots)
