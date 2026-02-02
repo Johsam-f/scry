@@ -30,6 +30,12 @@ if (password.length < 6) {
 
 // 6. Insecure cookie
 res.cookie('session', sessionId);
+res.cookie('auth', token, { httpOnly: false });
+ctx.cookies.set('user', userId);
+
+// 6b. Set-Cookie header
+res.setHeader('Set-Cookie', 'sessionId=abc123');
+document.cookie = 'tracking=xyz789';
 
 // 7. Private key
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
