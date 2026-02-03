@@ -43,6 +43,7 @@ scry scan . --output json
 5. **CORS Misconfiguration** 🌐 - Overly permissive CORS settings
 6. **.env Exposure** 📄 - Environment files in version control or public directories
 7. **Weak Cryptography** 🔒 - MD5, SHA1, DES, unsalted hashing, low iterations
+8. **Password Security** 🔑 - Plaintext storage, weak validation, insecure transmission
 
 ## Example Output
 
@@ -138,7 +139,8 @@ Create `.scryrc.json` in your project root:
     "cookie-security": "warn",
     "cors-config": "warn",
     "env-exposure": "error",
-    "weak-crypto": "error"
+    "weak-crypto": "error",
+    "password-security": "error"
   },
   "ignore": ["**/tests/**", "**/fixtures/**", "**/mocks/**"],
   "extensions": [".js", ".ts", ".jsx", ".tsx"],
