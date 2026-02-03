@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "description": "Sample Scry configuration with password-security rule enabled",
+  "rules": {
+    "hardcoded-secrets": "error",
+    "eval-usage": "error",
+    "jwt-storage": "error",
+    "cookie-security": "warn",
+    "cors-config": "warn",
+    "env-exposure": "error",
+    "weak-crypto": "error",
+    "password-security": "error"
+  },
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/tests/**",
+    "**/test/**",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/fixtures/**",
+    "**/mocks/**",
+    "**/__tests__/**"
+  ],
+  "extensions": [
+    ".js",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".mjs",
+    ".cjs",
+    ".vue",
+    ".svelte"
+  ],
+  "strict": true,
+  "minSeverity": "low",
+  "showFixes": true,
+  "showExplanations": true
+}
