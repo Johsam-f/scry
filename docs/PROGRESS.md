@@ -40,9 +40,9 @@
 ### Day 8-10: Complete Security Rules
 
 - [x] Cookie security flags check
-- [ ] CORS configuration analysis
-- [ ] `.env` file exposure check
-- [ ] Weak crypto detection
+- [x] CORS configuration analysis
+- [x] `.env` file exposure check
+- [x] Weak crypto detection
 - [ ] Password handling patterns
 
 ### Day 11-12: Enhanced Features
