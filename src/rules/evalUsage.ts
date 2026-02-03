@@ -133,7 +133,7 @@ const fn = operations[operationType];`;
         return `// [BAD] setTimeout with string
 setTimeout("doSomething()", 1000);
 
-// [GOOD] setTimeout with function
+// [GOOD] setTimeout with function reference
 setTimeout(() => doSomething(), 1000);
 setTimeout(doSomething, 1000);`;
 

@@ -27,7 +27,12 @@ export class HardcodedSecretsRule extends BaseRule {
     },
     {
       name: 'GitHub Token',
-      pattern: /ghp_[a-zA-Z0-9]{36}/g,
+      pattern: /ghp_[a-zA-Z0-9]{36,251}/g,
+      severity: 'high'
+    },
+    {
+      name: 'GitHub Token (Legacy)',
+      pattern: /\b[a-f0-9]{40}\b/g,
       severity: 'high'
     },
     {
@@ -38,7 +43,7 @@ export class HardcodedSecretsRule extends BaseRule {
     {
       name: 'Generic Password',
       pattern:
-        /['"](password|passwd|pwd)['"]\s*[:=]\s*['"]([^'"]{8,})['"]/gi,
+        /(password|passwd|pwd)\s*[:=]\s*['"]([^'"]{8,})['"]/gi,
       severity: 'medium'
     }
   ];
@@ -62,6 +67,22 @@ export class HardcodedSecretsRule extends BaseRule {
 
         if (lineContent.includes('//') || lineContent.includes('/*')) {
           continue;
+        }
+
+        // Skip legacy GitHub tokens that might be Git commit SHAs
+        // Look for context indicators that suggest it's a commit SHA
+        if (patternConfig.name === 'GitHub Token (Legacy)') {
+          const beforeMatch = content.substring(Math.max(0, match.index - 50), match.index);
+          const afterMatch = content.substring(match.index, Math.min(content.length, match.index + 100));
+          const context = beforeMatch + afterMatch;
+          
+          // Skip if it looks like a git commit reference
+          if (
+            /commit|sha|hash|revision|ref/i.test(context) ||
+            /git|github\.com.*commit/i.test(context)
+          ) {
+            continue;
+          }
         }
 
         const lineNumber = this.getLineNumber(content, match.index);
