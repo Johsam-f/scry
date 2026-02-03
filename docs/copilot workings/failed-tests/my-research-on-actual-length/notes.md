@@ -60,3 +60,6 @@ I can also say.. even though I know that my code can still be improved, I am sat
 
 and here is the screenshot of the copilot cli prompt:
 ![Copilot insights](screenshots/image.png)
+
+and here is the summary just for confirmation:
+![Copilot insights](screenshots/summary.png)
