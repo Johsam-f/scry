@@ -1,7 +1,9 @@
 # scry Development Progress
 
+**Challenge:** GitHub Copilot CLI Challenge 2026  
+**Challenge URL:** https://dev.to/challenges/github-2026-01-21  
 **Challenge Deadline:** February 15, 2026 at 11:59 PM PST  
-**Days Remaining:** ~18 days  
+**Days Remaining:** ~13 days  
 **Start Date:** January 28, 2026
 
 ---
@@ -37,10 +39,10 @@
 
 ### Day 8-10: Complete Security Rules
 
-- [ ] Cookie security flags check
-- [ ] CORS configuration analysis
-- [ ] `.env` file exposure check
-- [ ] Weak crypto detection
+- [x] Cookie security flags check
+- [x] CORS configuration analysis
+- [x] `.env` file exposure check
+- [x] Weak crypto detection
 - [ ] Password handling patterns
 
 ### Day 11-12: Enhanced Features
@@ -62,6 +64,19 @@
 
 ## Week 3: Polish & Submission (Feb 11 - Feb 15)
 
+### Submission Checklist (REQUIRED)
+
+- [ ] **DEV.to post written** with Copilot CLI showcase
+  - What I built
+  - How I used Copilot CLI (with examples & screenshots)
+  - Features implemented
+  - How to use scry
+  - GitHub repo link
+- [ ] **Screenshots of Copilot CLI usage** (5+ sessions documented)
+- [ ] **Working demo** with vulnerable code samples
+- [ ] **GitHub repo public** with clear README
+- [ ] **Post published** with tags: `devchallenge,githubchallenge,cli,githubcopilot`
+
 ### Day 15-16: Documentation & Video
 
 - [ ] Complete README with examples
@@ -80,18 +95,49 @@
 
 ## Copilot CLI Usage Log
 
+### Implementation Workflow
+
+**How to use Copilot CLI while implementing features:**
+
+1. **For understanding requirements:**
+
+   ```bash
+   gh copilot explain "What is a secure cookie flag?"
+   ```
+
+2. **For code generation:**
+
+   ```bash
+   gh copilot suggest "Generate a function to check cookie security flags in TypeScript"
+   ```
+
+3. **For debugging:**
+
+   ```bash
+   gh copilot explain "What does this regex do: /password\s*[:=]\s*['\"].*['\"]/"
+   ```
+
+4. **For test generation:**
+   ```bash
+   gh copilot suggest "Create unit tests for cookie security check in Jest"
+   ```
+
 ### Sessions
 
 Record each time GitHub Copilot CLI helps with development:
 
-#### Session 1: [Date]
-
-- **Task:**
-- **Copilot CLI used for:**
-- **Time saved:**
-- **Screenshot:**
-
 #### Session 2: [Date]
+
+- **Task:** Implement comprehensive cookie security detection rule (HttpOnly, Secure, SameSite flags)
+- **Copilot CLI used for:**
+  - Rule class generation with regex patterns for 4 cookie methods
+  - Test file generation (13 test cases)
+  - Security explanation content
+  - Fix suggestion templates
+- **Time saved:** ~2.5 hours
+- **Screenshot:** `docs/copilot workings/httpsonly-and-secure-flags-in-headers/screenshots/`
+
+#### Session 3: [Date]
 
 - **Task:**
 - **Copilot CLI used for:**
@@ -102,13 +148,23 @@ Record each time GitHub Copilot CLI helps with development:
 
 ## Metrics to Track
 
-- **Total LOC written:** ~1500+
-- **Security rules implemented:** 2 / 8
-- **Test coverage:** In progress
-- **Files scanned capability:** ✅ Works with glob patterns
+- **Total LOC written:** ~1700+ (added 207 for cookie security)
+- **Security rules implemented:** 3 / 8 (Hardcoded Secrets, JWT Storage, **Cookie Security**) → TARGET: 7/8 by Feb 10
+- **Test coverage:** 13 tests passing
+- **Files scanned capability:** Works with glob patterns
+- **Copilot CLI sessions:** 1 complete → TARGET: 5+ by submission
+- **Time saved with Copilot:** ~2.5 hours (Session 1)
 - **False positive rate:** TBD
-- **Copilot CLI sessions:** 0
-- **Time saved with Copilot:** 0 hours
+- **Copilot CLI sessions:** 0 → Tracking here ⬇️
+- **Time saved with Copilot:** 0 hours → Tracking here ⬇️
+
+### Remaining Features to Implement (Week 2)
+
+1. **Cookie security flags** - Check for Secure, HttpOnly, SameSite
+2. **CORS configuration** - Detect overly permissive CORS
+3. **`.env` exposure** - Find committed environment files
+4. **Weak crypto** - Identify insecure hash/encryption methods
+5. **Password patterns** - Check for weak password handling
 
 ---
 
@@ -148,3 +204,6 @@ Record each time GitHub Copilot CLI helps with development:
 - ✅ Set up output formatters (table, JSON, markdown)
 - ✅ Created test fixtures for vulnerable code samples
 - ✅ CLI working end-to-end (`bun scan` executes successfully)
+
+first Number-of-scanned-files-error### session-1
+second httpsonly-and-secure-flags-in-headers### session-2

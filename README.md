@@ -1,9 +1,5 @@
 # scry
 
-a command line tool to help develops avoid common mistakes
-
-# scry
-
 **A security-focused CLI that reveals hidden risks in JavaScript and Node.js codebases.**
 
 > In fantasy, _to scry_ means to reveal hidden truths. `scry` applies the same idea to code.
@@ -44,10 +40,9 @@ scry scan . --output json
 2. **JWT in Client Storage** ⚠️ - JWT tokens in localStorage/sessionStorage
 3. **Insecure Cookies** 🍪 - Missing httpOnly, secure, sameSite flags
 4. **eval() Usage** ☠️ - Dangerous code execution
-5. **CORS Misconfiguration** - Overly permissive CORS
-6. **.env Exposure** - Environment files in version control
-7. **Weak Cryptography** - MD5, SHA1, unsalted hashing
-8. **Password Patterns** - Weak password handling
+5. **CORS Misconfiguration** 🌐 - Overly permissive CORS settings
+6. **.env Exposure** 📄 - Environment files in version control or public directories
+7. **Weak Cryptography** 🔒 - MD5, SHA1, DES, unsalted hashing, low iterations
 
 ## Example Output
 
@@ -140,7 +135,10 @@ Create `.scryrc.json` in your project root:
     "hardcoded-secrets": "error",
     "eval-usage": "error",
     "jwt-storage": "error",
-    "cookie-security": "warn"
+    "cookie-security": "warn",
+    "cors-config": "warn",
+    "env-exposure": "error",
+    "weak-crypto": "error"
   },
   "ignore": ["**/tests/**", "**/fixtures/**", "**/mocks/**"],
   "extensions": [".js", ".ts", ".jsx", ".tsx"],
@@ -194,4 +192,4 @@ MIT
 
 **Built for the GitHub Copilot CLI Challenge**
 
-Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/COPILOT_USAGE.md](docs/COPILOT_USAGE.md)
+Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/screenshots](docs/screenshots)
