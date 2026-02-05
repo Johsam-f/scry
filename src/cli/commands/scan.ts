@@ -29,8 +29,8 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
     const output = render(result.findings, result.filesScanned, duration, {
       format: config.output,
       showSummary: true,
-      showExplanations: true,
-      showFixes: true
+      showExplanations: config.showExplanations,
+      showFixes: config.showFixes
     });
 
     console.log(output);

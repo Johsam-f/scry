@@ -99,15 +99,20 @@ scry scan ./src ./tests
 ### Output Formats
 
 ```bash
-# Table (default)
+# Table (default) - Detailed with colors
 scry scan . --output table
 
-# JSON for CI/CD integration
+# Compact - Minimal, file-grouped output
+scry scan . --output compact
+
+# JSON - For CI/CD integration
 scry scan . --output json > results.json
 
-# Markdown for reports
-scry scan . --output markdown
+# Markdown - For reports and documentation
+scry scan . --output markdown > SECURITY.md
 ```
+
+**See [Output Formats Guide](./docs/output-formats.md) for detailed examples and use cases.**
 
 ### Filter by Severity
 
@@ -115,9 +120,14 @@ scry scan . --output markdown
 # Only show high severity issues
 scry scan . --min-severity high
 
-# Show all issues
+# Show medium and high severity issues
+scry scan . --min-severity medium
+
+# Show all issues (default)
 scry scan . --min-severity low
 ```
+
+**Severity levels:** `high` (critical), `medium` (significant), `low` (minor)
 
 ### Strict Mode
 
