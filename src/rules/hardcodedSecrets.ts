@@ -27,7 +27,9 @@ export class HardcodedSecretsRule extends BaseRule {
     },
     {
       name: 'GitHub Token',
-      pattern: /ghp_[a-zA-Z0-9]{36,251}/g,
+      // GitHub PATs: ghp_ prefix + 36-255 alphanumeric characters
+      // Based on GitHub's token format specification
+      pattern: /ghp_[a-zA-Z0-9]{36,255}/g,
       severity: 'high'
     },
     {

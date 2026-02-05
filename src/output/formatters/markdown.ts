@@ -61,23 +61,38 @@ function formatFindingsTable(findings: Finding[]): string {
   table += '|------|------|------|--------|\n';
   
   for (const finding of findings) {
-    const file = finding.file.replace(/\|/g, '\\|');
-    const message = finding.message.replace(/\|/g, '\\|');
-    table += `| \`${finding.rule}\` | ${file} | ${finding.line} | ${message} |\n`;
+    // Escape backslashes first, then pipes to prevent incomplete sanitization
+    const rule = finding.rule.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const file = finding.file.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const message = finding.message.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    table += `| \`${rule}\` | ${file} | ${finding.line} | ${message} |\n`;
   }
   
   return table;
 }
 
-export function formatDetailedMarkdown(findings: Finding[]): string {
+export function formatDetailedMarkdown(findings: Finding[], filesScanned: number = 0, duration: number = 0): string {
   let output = '# Scry Security Scan - Detailed Report\n\n';
   
   if (findings.length === 0) {
     output += '✅ **No security issues found!**\n';
+    if (filesScanned > 0) {
+      output += `\n**Files Scanned:** ${filesScanned}\n`;
+    }
+    if (duration > 0) {
+      output += `**Duration:** ${duration.toFixed(2)}ms\n`;
+    }
     return output;
   }
   
-  output += `**Total Issues:** ${findings.length}\n\n`;
+  output += `**Total Issues:** ${findings.length}\n`;
+  if (filesScanned > 0) {
+    output += `**Files Scanned:** ${filesScanned}\n`;
+  }
+  if (duration > 0) {
+    output += `**Duration:** ${duration.toFixed(2)}ms\n`;
+  }
+  output += '\n';
   
   // Group by severity
   const groupedFindings = {

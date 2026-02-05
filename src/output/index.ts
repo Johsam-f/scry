@@ -24,7 +24,7 @@ export function render(findings: Finding[], filesScanned: number, duration: numb
 
     case 'markdown':
       output = (showExplanations || showFixes) 
-        ? formatDetailedMarkdown(findings)
+        ? formatDetailedMarkdown(findings, filesScanned, duration)
         : formatAsMarkdown(findings, filesScanned, duration);
       break;
 
