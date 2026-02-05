@@ -1,21 +1,21 @@
 import { Scanner } from '../../scanner';
 import { render } from '../../output';
 import type { CLIOptions, ScryConfig } from '../../types';
-import { defaultConfig } from '../../types';
 import { getAllRules } from '../rules';
+import { loadConfig, ConfigLoader } from '../../config';
 
 export async function handleScanCommand(path: string, options: CLIOptions): Promise<void> {
   try {
-    // Merge config
-    const config: ScryConfig = {
-      ...defaultConfig,
-      output: options.output || 'table',
-      strict: options.strict || false,
-      minSeverity: options.minSeverity || 'low'
-    };
+    // Load and merge configuration from file and CLI options
+    const config: ScryConfig = loadConfig(options);
 
-    // Get all rules
-    const rules = getAllRules();
+    // Get all rules and apply config
+    let rules = getAllRules();
+    
+    // Apply rule configurations from config file
+    if (Object.keys(config.rules).length > 0) {
+      rules = ConfigLoader.applyRuleConfigs(rules, config.rules);
+    }
 
     // Create scanner
     const scanner = new Scanner(rules, config);
