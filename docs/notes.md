@@ -10,3 +10,4 @@ env-cors-crypto
 password-handling-plan
 failed-tests
 scryrc.json
+output-formats
