@@ -30,7 +30,7 @@
 
 - [x] Hardcoded secrets detection
 - [x] JWT in localStorage check
-- [ ] `eval()` usage detection
+- [x] `eval()` usage detection
 - [x] Test with sample vulnerable code
 
 ---
@@ -43,13 +43,13 @@
 - [x] CORS configuration analysis
 - [x] `.env` file exposure check
 - [x] Weak crypto detection
-- [ ] Password handling patterns
+- [x] Password handling patterns
 
 ### Day 11-12: Enhanced Features
 
-- [ ] Configuration file support (`.scryrc.json`)
-- [ ] Multiple output formats (table, JSON, markdown)
-- [ ] Severity filtering (`--strict`, `--min-severity`)
+- [x] Configuration file support (`.scryrc.json`)
+- [x] Multiple output formats (table, JSON, markdown)
+- [x] Severity filtering (`--strict`, `--min-severity`)
 - [ ] Interactive fix suggestions
 - [ ] GitHub Copilot CLI integration showcase
 
@@ -152,11 +152,9 @@ Record each time GitHub Copilot CLI helps with development:
 - **Security rules implemented:** 3 / 8 (Hardcoded Secrets, JWT Storage, **Cookie Security**) → TARGET: 7/8 by Feb 10
 - **Test coverage:** 13 tests passing
 - **Files scanned capability:** Works with glob patterns
-- **Copilot CLI sessions:** 1 complete → TARGET: 5+ by submission
-- **Time saved with Copilot:** ~2.5 hours (Session 1)
+- **Copilot CLI sessions:** 4 complete → TARGET: 5+ by submission
+- **Time saved with Copilot:** ~8+ hours (cumulative across all sessions)
 - **False positive rate:** TBD
-- **Copilot CLI sessions:** 0 → Tracking here ⬇️
-- **Time saved with Copilot:** 0 hours → Tracking here ⬇️
 
 ### Remaining Features to Implement (Week 2)
 
@@ -205,5 +203,9 @@ Record each time GitHub Copilot CLI helps with development:
 - ✅ Created test fixtures for vulnerable code samples
 - ✅ CLI working end-to-end (`bun scan` executes successfully)
 
-first Number-of-scanned-files-error### session-1
-second httpsonly-and-secure-flags-in-headers### session-2
+### Session Tracking
+
+1. **Session 1:** Number-of-scanned-files-error - Fix scanner file count display
+2. **Session 2:** httpsonly-and-secure-flags-in-headers - Cookie security detection
+3. **Session 3:** scryrc.json-config - Configuration file support
+4. **Session 4:** output-formats - Multiple output formats & severity filtering

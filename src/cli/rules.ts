@@ -8,6 +8,7 @@ import { CookieSecurityRule } from '../rules/cookieSecurity';
 import { CORSConfigRule } from '../rules/corsConfig';
 import { EnvExposureRule } from '../rules/envExposure';
 import { WeakCryptoRule } from '../rules/weakCrypto';
+import { PasswordSecurityRule } from '../rules/passwordSecurity';
 
 export function getAllRules(): Rule[] {
   return [
@@ -17,7 +18,8 @@ export function getAllRules(): Rule[] {
     new CookieSecurityRule(),
     new CORSConfigRule(),
     new EnvExposureRule(),
-    new WeakCryptoRule()
+    new WeakCryptoRule(),
+    new PasswordSecurityRule()
   ];
 }
 

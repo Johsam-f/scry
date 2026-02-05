@@ -8,3 +8,6 @@ httpsonly-and-secure-flags-in-headers
 number of scanned files error
 env-cors-crypto
 password-handling-plan
+failed-tests
+scryrc.json
+output-formats

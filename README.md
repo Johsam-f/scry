@@ -43,6 +43,7 @@ scry scan . --output json
 5. **CORS Misconfiguration** 🌐 - Overly permissive CORS settings
 6. **.env Exposure** 📄 - Environment files in version control or public directories
 7. **Weak Cryptography** 🔒 - MD5, SHA1, DES, unsalted hashing, low iterations
+8. **Password Security** 🔑 - Plaintext storage, weak validation, insecure transmission
 
 ## Example Output
 
@@ -98,15 +99,20 @@ scry scan ./src ./tests
 ### Output Formats
 
 ```bash
-# Table (default)
+# Table (default) - Detailed with colors
 scry scan . --output table
 
-# JSON for CI/CD integration
+# Compact - Minimal, file-grouped output
+scry scan . --output compact
+
+# JSON - For CI/CD integration
 scry scan . --output json > results.json
 
-# Markdown for reports
-scry scan . --output markdown
+# Markdown - For reports and documentation
+scry scan . --output markdown > SECURITY.md
 ```
+
+**See [Output Formats Guide](./docs/output-formats.md) for detailed examples and use cases.**
 
 ### Filter by Severity
 
@@ -114,9 +120,14 @@ scry scan . --output markdown
 # Only show high severity issues
 scry scan . --min-severity high
 
-# Show all issues
+# Show medium and high severity issues
+scry scan . --min-severity medium
+
+# Show all issues (default)
 scry scan . --min-severity low
 ```
+
+**Severity levels:** `high` (critical), `medium` (significant), `low` (minor)
 
 ### Strict Mode
 
@@ -138,7 +149,8 @@ Create `.scryrc.json` in your project root:
     "cookie-security": "warn",
     "cors-config": "warn",
     "env-exposure": "error",
-    "weak-crypto": "error"
+    "weak-crypto": "error",
+    "password-security": "error"
   },
   "ignore": ["**/tests/**", "**/fixtures/**", "**/mocks/**"],
   "extensions": [".js", ".ts", ".jsx", ".tsx"],

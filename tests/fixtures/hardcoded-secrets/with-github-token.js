@@ -1,0 +1,4 @@
+// VULNERABLE - GitHub token hardcoded
+const GITHUB_TOKEN = 'ghp_123456789012345678901234567890123456';
+
+export default GITHUB_TOKEN;

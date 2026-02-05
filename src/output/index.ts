@@ -1,6 +1,8 @@
 import type { Finding, OutputFormat } from '../types';
 import { formatAsTable, formatSummary } from './formatters/table';
 import { formatAsJSON, formatDetailedJSON } from './formatters/json';
+import { formatAsMarkdown, formatDetailedMarkdown } from './formatters/markdown';
+import { formatAsCompact } from './formatters/compact';
 
 export interface RenderOptions {
   format: OutputFormat;
@@ -20,6 +22,16 @@ export function render(findings: Finding[], filesScanned: number, duration: numb
       output = options.detailed ? formatDetailedJSON(findings) : formatAsJSON(findings, filesScanned, duration);
       break;
 
+    case 'markdown':
+      output = (showExplanations || showFixes) 
+        ? formatDetailedMarkdown(findings, filesScanned, duration)
+        : formatAsMarkdown(findings, filesScanned, duration);
+      break;
+
+    case 'compact':
+      output = formatAsCompact(findings, filesScanned, duration);
+      break;
+
     case 'table':
     default:
       output = formatAsTable(findings);
@@ -29,8 +41,8 @@ export function render(findings: Finding[], filesScanned: number, duration: numb
       break;
   }
 
-  // Add detailed information if requested
-  if ((showExplanations || showFixes) && findings.length > 0) {
+  // Add detailed information for table format if requested
+  if (format === 'table' && (showExplanations || showFixes) && findings.length > 0) {
     output += formatDetails(findings, showExplanations, showFixes);
   }
 
