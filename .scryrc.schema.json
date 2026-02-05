@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scry Configuration",
+  "description": "Configuration schema for .scryrc.json",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to the JSON schema file"
+    },
+    "rules": {
+      "description": "Configure individual rules",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": ["off", "warn", "error"],
+            "description": "Shorthand for quick configuration"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Whether the rule is enabled"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"],
+                "description": "Severity level of the rule"
+              },
+              "options": {
+                "type": "object",
+                "description": "Rule-specific options"
+              }
+            },
+            "required": ["enabled"]
+          }
+        ]
+      }
+    },
+    "ignore": {
+      "description": "Glob patterns for files/directories to ignore",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extensions": {
+      "description": "File extensions to scan",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "output": {
+      "description": "Output format for scan results",
+      "type": "string",
+      "enum": ["table", "json", "markdown", "compact"]
+    },
+    "strict": {
+      "description": "Exit with error code if any findings are detected",
+      "type": "boolean"
+    },
+    "minSeverity": {
+      "description": "Minimum severity level to report",
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "showFixes": {
+      "description": "Show fix suggestions in output",
+      "type": "boolean"
+    },
+    "showExplanations": {
+      "description": "Show detailed explanations in output",
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

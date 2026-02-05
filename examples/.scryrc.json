@@ -1,6 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
-  "description": "Sample Scry configuration with password-security rule enabled",
+  "$schema": "../.scryrc.schema.json",
   "rules": {
     "hardcoded-secrets": "error",
     "eval-usage": "error",
