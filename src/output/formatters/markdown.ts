@@ -61,9 +61,10 @@ function formatFindingsTable(findings: Finding[]): string {
   table += '|------|------|------|--------|\n';
   
   for (const finding of findings) {
-    const rule = finding.rule.replace(/\|/g, '\\|');
-    const file = finding.file.replace(/\|/g, '\\|');
-    const message = finding.message.replace(/\|/g, '\\|');
+    // Escape backslashes first, then pipes to prevent incomplete sanitization
+    const rule = finding.rule.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const file = finding.file.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const message = finding.message.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
     table += `| \`${rule}\` | ${file} | ${finding.line} | ${message} |\n`;
   }
   
