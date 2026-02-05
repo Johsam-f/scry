@@ -61,7 +61,7 @@ export class PasswordSecurityRule extends BaseRule {
     },
     {
       name: 'Password comparison without timing safety',
-      pattern: /password\s*===?\s*|===?\s*password\b|password\s*!==?\s*|!==?\s*password\b/gi,
+      pattern: /password\s*[!=]==?\s*\S+|\S+\s*[!=]==?\s*password\b/gi,
       severity: 'medium' as const,
       message: 'Direct password comparison (vulnerable to timing attacks)',
       category: 'comparison',

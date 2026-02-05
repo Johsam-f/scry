@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { Scanner } from '../../src/scanner';
-import type { Rule, ScryConfig } from '../../src/types';
+import type { Rule, ScryConfig, Finding } from '../../src/types';
 
 // Mock rule for testing
 class MockRule implements Rule {

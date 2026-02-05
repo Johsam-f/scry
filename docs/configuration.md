@@ -23,7 +23,7 @@ The configuration file follows a JSON schema located at `.scryrc.schema.json`. M
     "hardcoded-secrets": "error",
     "eval-usage": "error",
     "weak-crypto": "warn",
-    "no-insecure-random": "off"
+    "jwt-storage": "off"
   },
   "ignore": ["**/node_modules/**", "**/dist/**", "**/*.test.ts"],
   "extensions": [".js", ".ts", ".jsx", ".tsx"],

@@ -21,14 +21,6 @@ describe('HardcodedSecretsRule', () => {
     expect(findings[0]?.message).toContain('API Key');
   });
 
-  test('should detect GitHub token', async () => {
-    const content = `const token = 'ghp_123456789012345678901234567890123456';`;
-    const findings = await rule.check(content, 'test.ts');
-    
-    expect(findings.length).toBe(1);
-    expect(findings[0]?.message).toContain('GitHub Token');
-  });
-
   test('should detect GitHub token with minimum length (36 chars)', async () => {
     const content = `const token = 'ghp_123456789012345678901234567890123456';`;
     const findings = await rule.check(content, 'test.ts');

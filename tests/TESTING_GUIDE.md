@@ -39,6 +39,9 @@ bun test tests/rules/weakCrypto.test.ts
 
 # Environment Exposure
 bun test tests/rules/envExposure.test.ts
+
+# Password Security
+bun test tests/rules/passwordSecurity.test.ts
 ```
 
 ## Test Organization
@@ -95,7 +98,8 @@ describe("RuleName", () => {
 | CORS Config       | 9      | [X]    |
 | Weak Crypto       | 11     | [X]    |
 | ENV Exposure      | 10     | [X]    |
-| **TOTAL**         | **69** | [X]    |
+| Password Security | 18     | [X]    |
+| **TOTAL**         | **87** | [X]    |
 
 ## Key Test Patterns
 
