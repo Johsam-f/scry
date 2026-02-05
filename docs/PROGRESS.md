@@ -30,7 +30,7 @@
 
 - [x] Hardcoded secrets detection
 - [x] JWT in localStorage check
-- [ ] `eval()` usage detection
+- [x] `eval()` usage detection
 - [x] Test with sample vulnerable code
 
 ---
@@ -43,11 +43,11 @@
 - [x] CORS configuration analysis
 - [x] `.env` file exposure check
 - [x] Weak crypto detection
-- [ ] Password handling patterns
+- [x] Password handling patterns
 
 ### Day 11-12: Enhanced Features
 
-- [ ] Configuration file support (`.scryrc.json`)
+- [x] Configuration file support (`.scryrc.json`)
 - [ ] Multiple output formats (table, JSON, markdown)
 - [ ] Severity filtering (`--strict`, `--min-severity`)
 - [ ] Interactive fix suggestions
