@@ -114,7 +114,7 @@ describe('HardcodedSecretsRule', () => {
   test('should skip comments with secrets', async () => {
     const content = `
       // const API_KEY = 'sk_live_1234567890abcdefghij';
-      /* const TOKEN = 'ghp_1234567890123456789012345678901234'; */
+      /* const TOKEN = 'ghp_123456789012345678901234567890123456'; */
     `;
     const findings = await rule.check(content, 'test.ts');
     
