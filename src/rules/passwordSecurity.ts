@@ -298,14 +298,14 @@ For sensitive applications, consider disabling autocomplete. For normal applicat
       case 'storage':
         return `Never store passwords in plaintext - always hash them:
 
-// ❌ NEVER: Plaintext password storage
+// [BAD] NEVER: Plaintext password storage
 const user = {
   username: 'alice',
   password: 'secret123' // NEVER DO THIS
 };
 await db.users.insert(user);
 
-// ✅ CORRECT: Hash passwords before storage
+// [GOOD] CORRECT: Hash passwords before storage
 const bcrypt = require('bcrypt');
 
 // When creating/updating password:
@@ -326,13 +326,13 @@ if (isValid) {
   // Password is correct
 }
 
-// ✅ Alternative: Argon2 (even better)
+// [GOOD] Alternative: Argon2 (even better)
 const argon2 = require('argon2');
 
 const hash = await argon2.hash(plainPassword);
 const isValid = await argon2.verify(hash, plainPassword);
 
-// ✅ Alternative: scrypt (built into Node.js crypto)
+// [GOOD] Alternative: scrypt (built into Node.js crypto)
 const crypto = require('crypto');
 
 const salt = crypto.randomBytes(16);
@@ -348,15 +348,15 @@ await db.users.insert({
       case 'logging':
         return `Never log passwords - redact or omit them:
 
-// ❌ NEVER: Logging passwords
+// [BAD] NEVER: Logging passwords
 console.log('User login:', username, password);
 logger.info({ username, password });
 
-// ✅ CORRECT: Omit password from logs
+// [GOOD] CORRECT: Omit password from logs
 console.log('User login:', username);
 logger.info({ username, action: 'login' });
 
-// ✅ CORRECT: Redact sensitive fields
+// [GOOD] CORRECT: Redact sensitive fields
 function sanitizeForLogging(obj) {
   const sanitized = { ...obj };
   const sensitiveFields = ['password', 'passwd', 'pwd', 'token', 'secret'];
@@ -372,7 +372,7 @@ function sanitizeForLogging(obj) {
 
 logger.info(sanitizeForLogging(req.body));
 
-// ✅ CORRECT: Use structured logging with field filtering
+// [GOOD] CORRECT: Use structured logging with field filtering
 const winston = require('winston');
 
 const logger = winston.createLogger({
@@ -387,24 +387,24 @@ const logger = winston.createLogger({
   )
 });
 
-// ✅ For debugging: Log that password was received
+// [GOOD] For debugging: Log that password was received
 console.log('Password received:', password ? 'yes' : 'no');
 console.log('Password length:', password?.length);`;
 
       case 'transmission':
         return `Always send passwords via POST with HTTPS, never in URLs or GET requests:
 
-// ❌ NEVER: Password in GET request
+// [BAD] NEVER: Password in GET request
 fetch(\`https://api.example.com/login?username=\${user}&password=\${pass}\`);
 
 axios.get('/login', {
   params: { username: user, password: pass }
 });
 
-// ❌ NEVER: Password in URL
+// [BAD] NEVER: Password in URL
 window.location.href = \`/login?password=\${pass}\`;
 
-// ✅ CORRECT: POST request with body
+// [GOOD] CORRECT: POST request with body
 fetch('https://api.example.com/login', {
   method: 'POST',
   headers: {
@@ -416,13 +416,13 @@ fetch('https://api.example.com/login', {
   })
 });
 
-// ✅ CORRECT: Axios POST
+// [GOOD] CORRECT: Axios POST
 axios.post('/login', {
   username: user,
   password: pass
 });
 
-// ✅ CORRECT: Fetch with FormData
+// [GOOD] CORRECT: Fetch with FormData
 const formData = new FormData();
 formData.append('username', user);
 formData.append('password', pass);
@@ -432,7 +432,7 @@ fetch('https://api.example.com/login', {
   body: formData
 });
 
-// ✅ Server side: Ensure HTTPS is enforced
+// [GOOD] Server side: Ensure HTTPS is enforced
 app.use((req, res, next) => {
   if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
     return res.redirect('https://' + req.get('host') + req.url);
@@ -443,11 +443,11 @@ app.use((req, res, next) => {
       case 'url':
         return `Never put credentials in URLs - use proper authentication:
 
-// ❌ NEVER: Credentials in URL
+// [BAD] NEVER: Credentials in URL
 const url = 'https://user:password@api.example.com/data';
 fetch(url);
 
-// ✅ CORRECT: Use Authorization header
+// [GOOD] CORRECT: Use Authorization header
 const auth = 'Basic ' + btoa(username + ':' + password);
 fetch('https://api.example.com/data', {
   headers: {
@@ -455,7 +455,7 @@ fetch('https://api.example.com/data', {
   }
 });
 
-// ✅ BETTER: Use token-based authentication
+// [GOOD] BETTER: Use token-based authentication
 // 1. Login to get token
 const loginResponse = await fetch('https://api.example.com/login', {
   method: 'POST',
@@ -471,13 +471,13 @@ fetch('https://api.example.com/data', {
   }
 });
 
-// ✅ BEST: OAuth 2.0 or OpenID Connect
+// [GOOD] BEST: OAuth 2.0 or OpenID Connect
 // Use established authentication libraries:
 // - passport.js (Node.js)
 // - NextAuth (Next.js)
 // - Auth0, Firebase Auth, AWS Cognito (managed services)
 
-// ✅ For database connections: Use connection objects
+// [GOOD] For database connections: Use connection objects
 const mysql = require('mysql2');
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -489,17 +489,17 @@ const connection = mysql.createConnection({
       case 'validation':
         return `Enforce strong password requirements:
 
-// ❌ WEAK: Password too short
+// [BAD] WEAK: Password too short
 function validatePassword(password) {
   return password.length >= 6;  // Too short!
 }
 
-// ❌ WEAK: No validation at all
+// [BAD] WEAK: No validation at all
 function validatePassword(password) {
   return true;  // Accepts anything!
 }
 
-// ✅ GOOD: Minimum 8 characters
+// [GOOD] GOOD: Minimum 8 characters
 function validatePassword(password) {
   if (password.length < 8) {
     return { valid: false, reason: 'Password must be at least 8 characters' };
@@ -507,7 +507,7 @@ function validatePassword(password) {
   return { valid: true };
 }
 
-// ✅ BETTER: Length + complexity requirements
+// [GOOD] BETTER: Length + complexity requirements
 function validatePassword(password) {
   const minLength = 12;
   const hasUpperCase = /[A-Z]/.test(password);
@@ -539,7 +539,7 @@ function validatePassword(password) {
   };
 }
 
-// ✅ BEST: Check against common passwords
+// [GOOD] BEST: Check against common passwords
 const commonPasswords = require('common-passwords'); // Use a library
 
 function validatePassword(password) {
@@ -569,7 +569,7 @@ function validatePassword(password) {
   return { valid: true };
 }
 
-// ✅ Consider using a library like zxcvbn for password strength estimation
+// [GOOD] Consider using a library like zxcvbn for password strength estimation
 const zxcvbn = require('zxcvbn');
 
 function validatePassword(password) {
@@ -589,19 +589,19 @@ function validatePassword(password) {
       case 'comparison':
         return `Use timing-safe password comparison methods:
 
-// ❌ VULNERABLE: Direct string comparison (timing attack)
+// [BAD] VULNERABLE: Direct string comparison (timing attack)
 if (password === storedPassword) {
   // Comparison time varies based on where strings differ
   login();
 }
 
-// ❌ VULNERABLE: Direct comparison of hashes
+// [BAD] VULNERABLE: Direct comparison of hashes
 if (hash(password) === storedHash) {
   // Still vulnerable to timing attacks
   login();
 }
 
-// ✅ CORRECT: Use bcrypt's built-in comparison
+// [GOOD] CORRECT: Use bcrypt's built-in comparison
 const bcrypt = require('bcrypt');
 
 const isValid = await bcrypt.compare(password, storedPasswordHash);
@@ -611,7 +611,7 @@ if (isValid) {
   login();
 }
 
-// ✅ CORRECT: Use crypto.timingSafeEqual for custom comparisons
+// [GOOD] CORRECT: Use crypto.timingSafeEqual for custom comparisons
 const crypto = require('crypto');
 
 function timingSafeCompare(a, b) {
@@ -639,7 +639,7 @@ if (timingSafeCompare(userInputHash, storedHash)) {
   login();
 }
 
-// ✅ BEST: Use password hashing library (handles timing safety)
+// [GOOD] BEST: Use password hashing library (handles timing safety)
 const argon2 = require('argon2');
 
 const isValid = await argon2.verify(storedHash, password);
@@ -661,18 +661,18 @@ try {
       case 'hardcoded':
         return `Never hardcode passwords - use environment variables or secure vaults:
 
-// ❌ NEVER: Hardcoded passwords
+// [BAD] NEVER: Hardcoded passwords
 const defaultPassword = 'admin123';
 const DB_PASSWORD = 'mySecretPassword';
 
-// ✅ CORRECT: Use environment variables
+// [GOOD] CORRECT: Use environment variables
 const defaultPassword = process.env.DEFAULT_PASSWORD;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 // Load from .env file (never commit .env to git!)
 require('dotenv').config();
 
-// ✅ CORRECT: Generate random password on first run
+// [GOOD] CORRECT: Generate random password on first run
 const crypto = require('crypto');
 
 function generateSecurePassword(length = 16) {
@@ -687,7 +687,7 @@ if (!process.env.ADMIN_PASSWORD) {
   process.exit(1);
 }
 
-// ✅ BETTER: Use secret management services
+// [GOOD] BETTER: Use secret management services
 // AWS Secrets Manager
 const AWS = require('aws-sdk');
 const secretsManager = new AWS.SecretsManager();
@@ -723,7 +723,7 @@ async function getPassword() {
   return result.data.data.password;
 }
 
-// ✅ For development: Use .env with .env.example template
+// [GOOD] For development: Use .env with .env.example template
 // .env.example (commit this):
 DB_HOST=localhost
 DB_USER=myuser
@@ -737,31 +737,31 @@ DB_PASSWORD=actual-secure-password-here`;
       case 'ui':
         return `Control password field autocomplete appropriately:
 
-<!-- ❌ Explicitly enabling autocomplete (usually unnecessary) -->
+<!-- [BAD] Explicitly enabling autocomplete (usually unnecessary) -->
 <input type="password" autocomplete="on" />
 
-<!-- ✅ For sensitive apps: Disable autocomplete -->
+<!-- [GOOD] For sensitive apps: Disable autocomplete -->
 <input 
   type="password" 
   autocomplete="off"
   name="password"
 />
 
-<!-- ✅ For new passwords: Use autocomplete="new-password" -->
+<!-- [GOOD] For new passwords: Use autocomplete="new-password" -->
 <input 
   type="password" 
   autocomplete="new-password"
   name="new-password"
 />
 
-<!-- ✅ For current passwords: Use autocomplete="current-password" -->
+<!-- [GOOD] For current passwords: Use autocomplete="current-password" -->
 <input 
   type="password" 
   autocomplete="current-password"
   name="current-password"
 />
 
-<!-- ✅ Full login form with proper autocomplete -->
+<!-- [GOOD] Full login form with proper autocomplete -->
 <form method="POST" action="/login">
   <input 
     type="text" 
@@ -776,7 +776,7 @@ DB_PASSWORD=actual-secure-password-here`;
   <button type="submit">Login</button>
 </form>
 
-<!-- ✅ Password change form -->
+<!-- [GOOD] Password change form -->
 <form method="POST" action="/change-password">
   <input 
     type="password" 
@@ -796,7 +796,7 @@ DB_PASSWORD=actual-secure-password-here`;
   <button type="submit">Change Password</button>
 </form>
 
-/* ✅ React example */
+/* [GOOD] React example */
 function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>

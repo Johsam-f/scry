@@ -167,7 +167,7 @@ export class CookieSecurityRule extends BaseRule {
     if (patternName === 'Express cookie' || patternName === 'Koa cookie') {
       return `Set cookies with proper security flags:
 
-// ✅ Secure configuration
+// [GOOD] Secure configuration
 res.cookie('${flags.cookieName}', value, {
   httpOnly: true,    // Prevent JavaScript access (XSS protection)
   secure: true,      // HTTPS only (MITM protection)
@@ -186,7 +186,7 @@ res.cookie('${flags.cookieName}', value, {
     if (patternName === 'Set-Cookie header') {
       return `Set the Set-Cookie header with proper flags:
 
-// ✅ Secure configuration
+// [GOOD] Secure configuration
 res.setHeader('Set-Cookie', 
   '${flags.cookieName}=value; HttpOnly; Secure; SameSite=Strict; Max-Age=3600'
 );
@@ -195,12 +195,12 @@ res.setHeader('Set-Cookie',
     }
 
     if (patternName === 'document.cookie') {
-      return `⚠️ Avoid setting cookies client-side. Use server-side cookie setting instead:
+      return `[WARNING] Avoid setting cookies client-side. Use server-side cookie setting instead:
 
-// ❌ Insecure (client-side)
+// [BAD] Insecure (client-side)
 document.cookie = '${flags.cookieName}=value';
 
-// ✅ Secure (server-side - Express example)
+// [GOOD] Secure (server-side - Express example)
 // In your API endpoint:
 res.cookie('${flags.cookieName}', value, {
   httpOnly: true,

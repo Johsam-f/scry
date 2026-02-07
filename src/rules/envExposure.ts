@@ -193,15 +193,15 @@ Ensure .env files are only accessed from server-side code and never exposed to c
       case 'Static .env serving':
         return `Exclude .env files from static file serving:
 
-// ❌ Insecure: May serve .env files
+// [BAD] Insecure: May serve .env files
 app.use(express.static('./'));
 app.use(express.static(__dirname));
 
-// ✅ Secure: Only serve specific public directory
+// [GOOD] Secure: Only serve specific public directory
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Secure: Explicitly exclude .env files
+// [GOOD] Secure: Explicitly exclude .env files
 const serveStatic = require('serve-static');
 app.use(serveStatic('public', {
   dotfiles: 'deny', // Deny access to dotfiles
@@ -220,9 +220,9 @@ location ~ /\\.env {
 1. Move .env to project root (not in public/static/dist):
    \`\`\`
    project/
-   ├── .env          ✅ Root level
+   ├── .env          [GOOD] Root level
    ├── .gitignore
-   ├── public/       ❌ Not here
+   ├── public/       [BAD] Not here
    └── src/
    \`\`\`
 
@@ -232,7 +232,7 @@ location ~ /\\.env {
    {
      "scripts": {
        "build": "webpack --mode production",
-       // Don't use: "cp .env dist/" ❌
+       // Don't use: "cp .env dist/" [BAD]
      }
    }
    \`\`\`
@@ -243,7 +243,7 @@ location ~ /\\.env {
    module.exports = {
      plugins: [
        new webpack.EnvironmentPlugin(['API_KEY']), // Inject specific vars
-       // Don't use CopyPlugin for .env ❌
+       // Don't use CopyPlugin for .env [BAD]
      ]
    };
    \`\`\``;
@@ -251,19 +251,19 @@ location ~ /\\.env {
       case 'Reading .env in client code':
         return `Never fetch .env from client-side code:
 
-// ❌ Insecure: Client-side fetch
+// [BAD] Insecure: Client-side fetch
 fetch('.env')
   .then(res => res.text())
   .then(data => console.log(data)); // NEVER DO THIS
 
-// ✅ Secure: Use build-time environment variables
+// [GOOD] Secure: Use build-time environment variables
 // Next.js example:
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-// ✅ Secure: Create React App example:
+// [GOOD] Secure: Create React App example:
 const apiKey = process.env.REACT_APP_API_KEY;
 
-// ✅ Secure: Vite example:
+// [GOOD] Secure: Vite example:
 const apiKey = import.meta.env.VITE_API_KEY;
 
 Note: Even with NEXT_PUBLIC_/REACT_APP_/VITE_ prefixes, these are exposed to clients.
@@ -276,14 +276,14 @@ const data = await fetch('/api/data'); // API uses secret server-side`;
       case '.env file path in code':
         return `Ensure .env is only accessed server-side:
 
-// ✅ Secure: Server-side only (Node.js)
+// [GOOD] Secure: Server-side only (Node.js)
 require('dotenv').config();
 const dbPassword = process.env.DB_PASSWORD;
 
-// ✅ Secure: Specify path if needed
+// [GOOD] Secure: Specify path if needed
 require('dotenv').config({ path: '.env.local' });
 
-// ❌ Insecure: Never expose to client
+// [BAD] Insecure: Never expose to client
 // Don't bundle .env with client-side code
 // Don't import .env in React/Vue components
 // Don't read .env from browser

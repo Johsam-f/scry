@@ -116,11 +116,11 @@ export class CORSConfigRule extends BaseRule {
             `Setting Access-Control-Allow-Credentials to true with a wildcard (*) origin is blocked by browsers as it's extremely dangerous. This combination would allow any website to make authenticated requests to your API.`,
             `Remove wildcard origin and specify exact origins:
 
-// ❌ BLOCKED by browsers
+// [BAD] BLOCKED by browsers
 res.setHeader('Access-Control-Allow-Origin', '*');
 res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-// ✅ Secure configuration
+// [GOOD] Secure configuration
 const allowedOrigins = ['https://yourdomain.com', 'https://app.yourdomain.com'];
 const origin = req.headers.origin;
 if (allowedOrigins.includes(origin)) {
@@ -179,7 +179,7 @@ The null origin should be explicitly rejected in most cases.`;
       case 'Reflected origin without validation':
         return `Use a whitelist of allowed origins:
 
-// ✅ Secure: Whitelist specific origins
+// [GOOD] Secure: Whitelist specific origins
 const allowedOrigins = [
   'https://yourdomain.com',
   'https://app.yourdomain.com'
@@ -199,7 +199,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];`;
       case 'Express CORS wildcard':
         return `Configure Express CORS with a whitelist:
 
-// ✅ Secure: Whitelist specific origins
+// [GOOD] Secure: Whitelist specific origins
 const allowedOrigins = [
   'https://yourdomain.com',
   'https://app.yourdomain.com'
@@ -228,14 +228,14 @@ app.use(cors({
       case 'Express CORS permissive function':
         return `Implement proper origin validation:
 
-// ❌ Insecure: Always returns true
+// [BAD] Insecure: Always returns true
 app.use(cors({
   origin: function (origin, callback) {
     return callback(null, true); // BAD
   }
 }));
 
-// ✅ Secure: Validate against whitelist
+// [GOOD] Secure: Validate against whitelist
 const allowedOrigins = ['https://yourdomain.com', 'https://app.yourdomain.com'];
 
 app.use(cors({
@@ -251,7 +251,7 @@ app.use(cors({
       case 'Null origin allowed':
         return `Reject null origins explicitly:
 
-// ✅ Secure: Reject null origin
+// [GOOD] Secure: Reject null origin
 const allowedOrigins = ['https://yourdomain.com', 'https://app.yourdomain.com'];
 
 const origin = req.headers.origin;

@@ -18,7 +18,7 @@ export function formatAsMarkdown(findings: Finding[], filesScanned: number, dura
   output += `- **Low Severity:** ${low}\n\n`;
   
   if (findings.length === 0) {
-    output += '✅ **No security issues found!**\n';
+    output += '**No security issues found!**\n';
     return output;
   }
   

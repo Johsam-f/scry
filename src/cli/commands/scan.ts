@@ -4,6 +4,7 @@ import type { CLIOptions, ScryConfig } from '../../types';
 import { getAllRules } from '../rules';
 import { loadConfig, ConfigLoader } from '../../config';
 import { formatError } from '../../errors';
+import logSymbols from 'log-symbols';
 
 export async function handleScanCommand(path: string, options: CLIOptions): Promise<void> {
   // Check for verbose mode
@@ -48,11 +49,11 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
   } catch (error) {
     // Format and display error with context
     const errorOutput = formatError(error, verbose);
-    console.error('\n❌ ' + errorOutput);
+    console.error(`\n${logSymbols.error} ${errorOutput}`);
     
     // Show hint about verbose mode if not already enabled
     if (!verbose) {
-      console.error('\n💡 Tip: Set VERBOSE=1 environment variable for detailed error information');
+      console.error(`\n${logSymbols.info} Tip: Set VERBOSE=1 environment variable for detailed error information`);
     }
     
     process.exit(1);

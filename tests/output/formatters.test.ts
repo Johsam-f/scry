@@ -204,7 +204,7 @@ describe('Output Formatters', () => {
         format: 'markdown'
       });
 
-      expect(output).toContain('✅ **No security issues found!**');
+      expect(output).toContain('**No security issues found!**');
     });
   });
 
