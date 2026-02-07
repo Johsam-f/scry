@@ -102,6 +102,7 @@ export class ConfigLoader {
       // Normalize rules configuration
       if (rawConfig.rules) {
         config.rules = {};
+        
         for (const [ruleId, ruleConfig] of Object.entries(rawConfig.rules)) {
           if (typeof ruleConfig === 'string') {
             // Handle shorthand: "off" | "warn" | "error"
@@ -291,17 +292,32 @@ export class ConfigLoader {
     rules: T[],
     ruleConfigs: Record<string, RuleConfig>
   ): T[] {
+    // Validate that all configured rule IDs exist
+    const validRuleIds = new Set(rules.map(rule => rule.id));
+    const invalidRuleIds = Object.keys(ruleConfigs).filter(id => !validRuleIds.has(id));
+    
+    if (invalidRuleIds.length > 0) {
+      throw new ConfigError(
+        `Unknown rule ID${invalidRuleIds.length > 1 ? 's' : ''}: ${invalidRuleIds.map(id => `"${id}"`).join(', ')}`,
+        { 
+          invalidRuleIds, 
+          validRuleIds: Array.from(validRuleIds).sort()
+        }
+      );
+    }
+
     return rules.map(rule => {
       const config = ruleConfigs[rule.id];
       if (!config) {
         return rule;
       }
 
-      return {
-        ...rule,
-        enabled: config.enabled,
-        severity: config.severity ?? rule.severity
-      };
+      // Modify the rule in place to preserve class methods
+      rule.enabled = config.enabled;
+      if (config.severity) {
+        rule.severity = config.severity;
+      }
+      return rule;
     });
   }
 }
