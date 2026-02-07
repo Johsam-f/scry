@@ -41,7 +41,7 @@ export class CORSConfigRule extends BaseRule {
     },
     {
       name: 'Express CORS permissive function',
-      pattern: /cors\s*\(\s*\{\s*origin\s*:\s*(?:function|=>|\([^)]*\)\s*=>)[^}]*return\s+true/gi,
+      pattern: /cors\s*\(\s*\{\s*origin\s*:\s*(?:function|=>|\([^)]{0,100}\)\s*=>)[^}]{0,500}return\s+true/gi,
       severity: 'medium' as const,
       message: 'CORS origin function always returns true'
     },
@@ -68,17 +68,17 @@ export class CORSConfigRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      let match;
+      
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        const lineNumber = this.getLineNumber(content, match.index);
-
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineContent = content.substring(lineStart, match.index);
-        if (lineContent.includes('//') || lineContent.includes('/*')) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
+
+        const lineNumber = this.getLineNumber(content, match.index);
 
         // Track wildcard and credentials for combined check
         if (patternConfig.name === 'Wildcard CORS') {

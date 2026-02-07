@@ -42,25 +42,13 @@ export class EvalUsageRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      let match;
+      
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineEnd = content.indexOf('\n', match.index);
-        const lineContent = content.substring(lineStart, lineEnd === -1 ? content.length : lineEnd);
-
-        // Skip single-line comments
-        const beforeMatch = lineContent.substring(0, match.index - lineStart);
-        if (beforeMatch.includes('//')) {
-          continue;
-        }
-
-        // Skip multi-line comments (simple check)
-        const beforeContent = content.substring(0, match.index);
-        const lastCommentStart = beforeContent.lastIndexOf('/*');
-        const lastCommentEnd = beforeContent.lastIndexOf('*/');
-        if (lastCommentStart > lastCommentEnd) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 

@@ -90,9 +90,16 @@ export class CookieSecurityRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      let match;
+      
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
+      for (const match of matches) {
+        // Skip if in comment
+        if (this.isInComment(content, match.index)) {
+          continue;
+        }
+
         const flags = patternConfig.checkFlags(match);
         const lineNumber = this.getLineNumber(content, match.index);
         const missingFlags: string[] = [];

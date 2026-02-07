@@ -131,16 +131,15 @@ export class PasswordSecurityRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      let match;
+      
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
+      for (const match of matches) {
         const lineNumber = this.getLineNumber(content, match.index);
         
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const beforeMatch = content.substring(lineStart, match.index);
-        
-        if (this.isInComment(beforeMatch, content, match.index)) {
+        // Skip if in comment using robust detection from base class
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 
@@ -197,19 +196,6 @@ export class PasswordSecurityRule extends BaseRule {
     }
 
     return findings;
-  }
-
-  private isInComment(beforeMatch: string, content: string, index: number): boolean {
-    // Check for single-line comment
-    if (beforeMatch.includes('//')) {
-      return true;
-    }
-
-    // Check for multi-line comment
-    const lastCommentStart = content.lastIndexOf('/*', index);
-    const lastCommentEnd = content.lastIndexOf('*/', index);
-    
-    return lastCommentStart > lastCommentEnd;
   }
 
   private getExplanation(category: string): string {

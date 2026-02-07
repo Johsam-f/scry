@@ -56,14 +56,13 @@ export class HardcodedSecretsRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      let match;
+      
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineContent = content.substring(lineStart, match.index);
-
-        if (lineContent.includes('//') || lineContent.includes('/*')) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 
