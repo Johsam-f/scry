@@ -8,10 +8,10 @@
 
 **scry** is a command-line security scanner that detects common but dangerous security mistakes in JavaScript/TypeScript projects and provides:
 
-✅ **Clear explanations** of why each issue is risky  
-✅ **Actionable fixes** with code examples  
-✅ **Educational context** to build security awareness  
-✅ **Fast, focused scanning** without overwhelming noise
+[+] **Clear explanations** of why each issue is risky  
+[+] **Actionable fixes** with code examples  
+[+] **Educational context** to build security awareness  
+[+] **Fast, focused scanning** without overwhelming noise
 
 ## Quick Start
 
@@ -36,14 +36,14 @@ scry scan . --output json
 
 ### Security Rules
 
-1. **Hardcoded Secrets** 🔐 - API keys, tokens, passwords, AWS credentials
-2. **JWT in Client Storage** ⚠️ - JWT tokens in localStorage/sessionStorage
-3. **Insecure Cookies** 🍪 - Missing httpOnly, secure, sameSite flags
-4. **eval() Usage** ☠️ - Dangerous code execution
-5. **CORS Misconfiguration** 🌐 - Overly permissive CORS settings
-6. **.env Exposure** 📄 - Environment files in version control or public directories
-7. **Weak Cryptography** 🔒 - MD5, SHA1, DES, unsalted hashing, low iterations
-8. **Password Security** 🔑 - Plaintext storage, weak validation, insecure transmission
+1. **Hardcoded Secrets** - API keys, tokens, passwords, AWS credentials
+2. **JWT in Client Storage** - JWT tokens in localStorage/sessionStorage
+3. **Insecure Cookies** - Missing httpOnly, secure, sameSite flags
+4. **eval() Usage** - Dangerous code execution
+5. **CORS Misconfiguration** - Overly permissive CORS settings
+6. **.env Exposure** - Environment files in version control or public directories
+7. **Weak Cryptography** - MD5, SHA1, DES, unsalted hashing, low iterations
+8. **Password Security** - Plaintext storage, weak validation, insecure transmission
 
 ## Example Output
 
@@ -51,9 +51,9 @@ scry scan . --output json
 ┌──────────┬────────────────────┬─────────────────┬──────┬──────────────────────┐
 │ Severity │ Rule               │ File            │ Line │ Message              │
 ├──────────┼────────────────────┼─────────────────┼──────┼──────────────────────┤
-│ ●●● HIGH │ hardcoded-secrets  │ src/config.ts   │ 14   │ Hardcoded API key    │
-│ ●●● HIGH │ jwt-storage        │ src/auth.ts     │ 28   │ JWT in localStorage  │
-│ ●● MEDIUM│ cors-config        │ src/server.ts   │ 45   │ Permissive CORS      │
+│ [HIGH]   │ hardcoded-secrets  │ src/config.ts   │ 14   │ Hardcoded API key    │
+│ [HIGH]   │ jwt-storage        │ src/auth.ts     │ 28   │ JWT in localStorage  │
+│ [MEDIUM] │ cors-config        │ src/server.ts   │ 45   │ Permissive CORS      │
 └──────────┴────────────────────┴─────────────────┴──────┴──────────────────────┘
 
 Summary:
@@ -61,9 +61,9 @@ Files scanned: 847
 Duration: 2.3s
 
 Results:
-●●● High: 3
-●● Medium: 6
-● Low: 3
+[HIGH] Count: 3
+[MEDIUM] Count: 6
+[LOW] Count: 3
 Total: 12
 ```
 
@@ -177,6 +177,16 @@ While powerful tools like linters exist, many:
 - Educational, not noisy
 - Focused on real-world security footguns
 
+## Documentation
+
+For more detailed information, see:
+
+- [Installation Guide](docs/INSTALLATION_GUIDE.md) - Setup and configuration
+- [Security Rules Guide](docs/SECURITY_RULES_GUIDE.md) - Detailed rule documentation
+- [Copilot Impact](docs/COPILOT_IMPACT.md) - How GitHub Copilot CLI enhanced development
+- [Configuration Reference](docs/configuration.md) - Configuration file options
+- [Implementation Guide](docs/IMPLEMENTATION_GUIDE.md) - Architecture and development
+
 ## Contributing
 
 Contributions welcome! Areas to help:
@@ -192,9 +202,19 @@ Contributions welcome! Areas to help:
 
 MIT
 
-## Built with
+## Built for the GitHub Copilot CLI Challenge
 
-- **TypeScript** - Type safety
+This project was created for the [GitHub Copilot CLI Challenge](https://dev.to/challenges/github-2026-01-21) and demonstrates how GitHub Copilot CLI can accelerate security tool development.
+
+**Key Achievement Highlights:**
+
+- 8 security rules implemented with Copilot-assisted pattern generation
+- Comprehensive test coverage with AI-generated test cases
+- Multiple output formatters for different workflows
+- Full configuration file support for flexible deployments
+
+See [Copilot Impact Documentation](docs/COPILOT_IMPACT.md) for detailed information on how Copilot CLI enhanced the development process, with session logs, time savings analysis, and specific examples of AI-assisted development.
+
 - **Bun** - Fast runtime
 - **Commander.js** - CLI framework
 - **Chalk** - Terminal colors
