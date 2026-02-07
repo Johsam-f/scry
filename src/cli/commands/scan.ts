@@ -30,7 +30,9 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       format: config.output,
       showSummary: true,
       showExplanations: config.showExplanations,
-      showFixes: config.showFixes
+      showFixes: config.showFixes,
+      filesSkipped: result.filesSkipped,
+      skippedFiles: result.skippedFiles
     });
 
     console.log(output);
@@ -40,7 +42,11 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       process.exit(1);
     }
   } catch (error) {
-    console.error('Error during scan:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Error during scan:', errorMsg);
+    if (error instanceof Error && process.env.DEBUG) {
+      console.error('Stack trace:', error.stack);
+    }
     process.exit(1);
   }
 }

@@ -10,10 +10,12 @@ export interface RenderOptions {
   showExplanations?: boolean;
   showFixes?: boolean;
   detailed?: boolean;
+  filesSkipped?: number;
+  skippedFiles?: Array<{ file: string; reason: string }>;
 }
 
 export function render(findings: Finding[], filesScanned: number, duration: number, options: RenderOptions): string {
-  const { format, showSummary = true, showExplanations = false, showFixes = false } = options;
+  const { format, showSummary = true, showExplanations = false, showFixes = false, filesSkipped = 0, skippedFiles = [] } = options;
 
   let output = '';
 

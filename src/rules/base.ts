@@ -49,4 +49,9 @@ export abstract class BaseRule implements Rule {
     const lines = content.split('\n');
     return lines[lineNumber - 1] || '';
   }
+
+  // Helper to create a fresh regex instance to avoid state issues
+  protected createRegex(pattern: RegExp): RegExp {
+    return new RegExp(pattern.source, pattern.flags);
+  }
 }

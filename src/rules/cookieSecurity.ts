@@ -88,13 +88,9 @@ export class CookieSecurityRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
       let match;
-      const pattern = patternConfig.pattern;
-
-      // Reset regex if global flag
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
 
       while ((match = pattern.exec(content)) !== null) {
         const flags = patternConfig.checkFlags(match);

@@ -106,12 +106,9 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
     }
 
     for (const patternConfig of this.patterns) {
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
       let match;
-      const pattern = patternConfig.pattern;
-
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
 
       while ((match = pattern.exec(content)) !== null) {
         const lineNumber = this.getLineNumber(content, match.index);

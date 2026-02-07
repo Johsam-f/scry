@@ -15,7 +15,7 @@ export class Scanner {
   }
 
   // Scan a directory for security issues
-  async scan(path: string): Promise<{ findings: Finding[]; filesScanned: number }> {
+  async scan(path: string): Promise<{ findings: Finding[]; filesScanned: number; filesSkipped: number; skippedFiles: Array<{ file: string; reason: string }> }> {
     const spinner = ora('Scanning files...').start();
 
     try {
@@ -30,6 +30,8 @@ export class Scanner {
 
       // Scan all files
       const allFindings: Finding[] = [];
+      const skippedFiles: Array<{ file: string; reason: string }> = [];
+      let filesScanned = 0;
 
       for (const filePath of files) {
         try {
@@ -41,23 +43,54 @@ export class Scanner {
             .filter((rule) => rule.enabled)
             .map((rule) => rule.check(content, filePath));
 
-          const results = await Promise.all(rulePromises);
-          const findings = results.flat();
+          const results = await Promise.allSettled(rulePromises);
+          
+          // Collect successful results
+          const findings: Finding[] = [];
+          for (const result of results) {
+            if (result.status === 'fulfilled') {
+              findings.push(...result.value);
+            } else {
+              // Log rule failure but continue scanning
+              const ruleName = 'unknown';
+              spinner.warn(`Rule check failed for ${filePath}: ${result.reason}`);
+            }
+          }
 
           // Filter by severity
           const filtered = findings.filter((f) => this.shouldIncludeFinding(f));
           allFindings.push(...filtered);
+          filesScanned++;
         } catch (error) {
-          // Skip files that can't be read
-          continue;
+          // Log files that can't be read
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          const shortPath = filePath.length > 50 ? '...' + filePath.slice(-47) : filePath;
+          spinner.warn(`Skipped ${shortPath}: ${errorMsg}`);
+          skippedFiles.push({ file: filePath, reason: errorMsg });
         }
       }
 
-      spinner.succeed(`Scan complete. Found ${allFindings.length} issues.`);
+      const successMsg = filesScanned === files.length
+        ? `Scan complete. Scanned ${filesScanned} files, found ${allFindings.length} issues.`
+        : `Scan complete. Scanned ${filesScanned}/${files.length} files (${skippedFiles.length} skipped), found ${allFindings.length} issues.`;
+      
+      spinner.succeed(successMsg);
+
+      // Log skipped files summary if any
+      if (skippedFiles.length > 0 && skippedFiles.length <= 5) {
+        console.log(`\nSkipped files:`);
+        skippedFiles.forEach(({ file, reason }) => {
+          console.log(`  • ${file}: ${reason}`);
+        });
+      } else if (skippedFiles.length > 5) {
+        console.log(`\n${skippedFiles.length} files were skipped (use --verbose to see details)`);
+      }
 
       return {
         findings: allFindings,
-        filesScanned: files.length
+        filesScanned,
+        filesSkipped: skippedFiles.length,
+        skippedFiles
       };
     } catch (error) {
       spinner.fail(`Scan failed: ${error}`);
