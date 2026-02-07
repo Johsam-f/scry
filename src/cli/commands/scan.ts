@@ -3,8 +3,12 @@ import { render } from '../../output';
 import type { CLIOptions, ScryConfig } from '../../types';
 import { getAllRules } from '../rules';
 import { loadConfig, ConfigLoader } from '../../config';
+import { formatError } from '../../errors';
 
 export async function handleScanCommand(path: string, options: CLIOptions): Promise<void> {
+  // Check for verbose mode
+  const verbose = process.env.VERBOSE === '1' || process.env.DEBUG === '1';
+
   try {
     // Load and merge configuration from file and CLI options
     const config: ScryConfig = loadConfig(options);
@@ -42,11 +46,15 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       process.exit(1);
     }
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error('Error during scan:', errorMsg);
-    if (error instanceof Error && process.env.DEBUG) {
-      console.error('Stack trace:', error.stack);
+    // Format and display error with context
+    const errorOutput = formatError(error, verbose);
+    console.error('\n❌ ' + errorOutput);
+    
+    // Show hint about verbose mode if not already enabled
+    if (!verbose) {
+      console.error('\n💡 Tip: Set VERBOSE=1 environment variable for detailed error information');
     }
+    
     process.exit(1);
   }
 }

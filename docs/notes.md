@@ -11,3 +11,5 @@ password-handling-plan
 failed-tests
 scryrc.json
 output-formats
+single-file-scan
+code-analysis-for-improvements

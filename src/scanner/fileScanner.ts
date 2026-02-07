@@ -3,6 +3,7 @@ import { readFile, stat } from 'fs/promises';
 import type { Ignore } from 'ignore';
 import ignore from 'ignore';
 import { join, resolve, extname } from 'path';
+import { FileError } from '../errors';
 
 export interface ScanOptions {
   path: string;
@@ -30,7 +31,12 @@ export async function scanFiles(options: ScanOptions): Promise<string[]> {
         continue;
       }
     }
-    throw new Error(`Path not found: ${path}`);
+    const cause = error instanceof Error ? error : new Error(String(error));
+    throw new FileError(
+      `Path not found`,
+      { path, triedExtensions: extensions },
+      cause
+    );
   }
 
   // If it's a file, return just that file
@@ -40,7 +46,10 @@ export async function scanFiles(options: ScanOptions): Promise<string[]> {
     
     // Check if file has a valid extension
     if (!extensions.includes(ext)) {
-      throw new Error(`File extension ${ext} is not supported. Supported extensions: ${extensions.join(', ')}`);
+      throw new FileError(
+        `File extension not supported`,
+        { path: filePath, extension: ext, supportedExtensions: extensions }
+      );
     }
     
     return [filePath];
@@ -71,7 +80,12 @@ export async function readFileContent(filePath: string): Promise<string> {
   try {
     return await readFile(filePath, 'utf-8');
   } catch (error) {
-    throw new Error(`Failed to read file ${filePath}: ${error}`);
+    const cause = error instanceof Error ? error : new Error(String(error));
+    throw new FileError(
+      `Failed to read file`,
+      { filePath, error: cause.message },
+      cause
+    );
   }
 }
 

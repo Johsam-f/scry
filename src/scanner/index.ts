@@ -1,5 +1,6 @@
 import type { Finding, Rule, Severity, ScryConfig } from '../types';
 import { scanFiles, readFileContent, getFileExtension, shouldScanFile } from './fileScanner';
+import { ScanError, RuleError, wrapError } from '../errors';
 import ora from 'ora';
 
 export class Scanner {
@@ -26,6 +27,16 @@ export class Scanner {
         extensions: this.config.extensions
       });
 
+      if (files.length === 0) {
+        spinner.warn(`No files found to scan in: ${path}`);
+        return {
+          findings: [],
+          filesScanned: 0,
+          filesSkipped: 0,
+          skippedFiles: []
+        };
+      }
+
       spinner.text = `Found ${files.length} files. Scanning...`;
 
       // Scan all files
@@ -38,24 +49,45 @@ export class Scanner {
           const content = await readFileContent(filePath);
           const ext = getFileExtension(filePath);
 
+          // Get enabled rules
+          const enabledRules = Array.from(this.rules.values()).filter((rule) => rule.enabled);
+          
+          if (enabledRules.length === 0) {
+            throw new ScanError('No rules enabled for scanning', { path, enabledRules: 0 });
+          }
+
           // Run enabled rules in parallel
-          const rulePromises = Array.from(this.rules.values())
-            .filter((rule) => rule.enabled)
-            .map((rule) => rule.check(content, filePath));
+          const rulePromises = enabledRules.map((rule) => 
+            rule.check(content, filePath).catch((error) => {
+              // Wrap rule errors with context
+              const ruleError = new RuleError(
+                `Rule "${rule.id}" failed`,
+                { ruleId: rule.id, ruleName: rule.name, filePath },
+                error instanceof Error ? error : new Error(String(error))
+              );
+              throw ruleError;
+            })
+          );
 
           const results = await Promise.allSettled(rulePromises);
           
-          // Collect successful results
+          // Collect successful results and log failures
           const findings: Finding[] = [];
-          for (const result of results) {
+          results.forEach((result, i) => {
             if (result.status === 'fulfilled') {
               findings.push(...result.value);
             } else {
               // Log rule failure but continue scanning
-              const ruleName = 'unknown';
-              spinner.warn(`Rule check failed for ${filePath}: ${result.reason}`);
+              const rule = enabledRules[i];
+              if (!rule) return;
+              const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason);
+              spinner.warn(`Rule "${rule.id}" failed for ${filePath}: ${errorMsg}`);
+              
+              if (process.env.VERBOSE && result.reason instanceof Error && result.reason.stack) {
+                console.error(`  Stack: ${result.reason.stack.split('\n').slice(0, 3).join('\n')}`);
+              }
             }
-          }
+          });
 
           // Filter by severity
           const filtered = findings.filter((f) => this.shouldIncludeFinding(f));
@@ -83,7 +115,7 @@ export class Scanner {
           console.log(`  • ${file}: ${reason}`);
         });
       } else if (skippedFiles.length > 5) {
-        console.log(`\n${skippedFiles.length} files were skipped (use --verbose to see details)`);
+        console.log(`\n${skippedFiles.length} files were skipped (use VERBOSE=1 to see details)`);
       }
 
       return {
@@ -93,8 +125,14 @@ export class Scanner {
         skippedFiles
       };
     } catch (error) {
-      spinner.fail(`Scan failed: ${error}`);
-      throw error;
+      spinner.fail(`Scan failed`);
+      
+      // Wrap the error with scan context
+      if (error instanceof ScanError) {
+        throw error;
+      }
+      
+      throw wrapError(error, 'Scan operation failed', { path, configuredRules: this.rules.size });
     }
   }
 
