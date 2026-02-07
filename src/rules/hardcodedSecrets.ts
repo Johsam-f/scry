@@ -66,17 +66,63 @@ export class HardcodedSecretsRule extends BaseRule {
           continue;
         }
 
-        // Skip legacy GitHub tokens that might be Git commit SHAs
-        // Look for context indicators that suggest it's a commit SHA
+        // Skip legacy GitHub tokens that might be Git commit SHAs or other hex values
+        // Legacy GitHub tokens (40 hex chars) have high false positive rate
         if (patternConfig.name === 'GitHub Token (Legacy)') {
-          const beforeMatch = content.substring(Math.max(0, match.index - 50), match.index);
-          const afterMatch = content.substring(match.index, Math.min(content.length, match.index + 100));
+          const beforeMatch = content.substring(Math.max(0, match.index - 80), match.index);
+          const afterMatch = content.substring(match.index, Math.min(content.length, match.index + 120));
           const context = beforeMatch + afterMatch;
+          const matchValue = match[0];
           
-          // Skip if it looks like a git commit reference
+          // Skip if it's likely NOT a secret based on context indicators:
+          
+          // 1. Git/VCS related (must be specific to avoid false negatives)
           if (
-            /commit|sha|hash|revision|ref/i.test(context) ||
-            /git|github\.com.*commit/i.test(context)
+            /\b(commit|sha|revision|ref)\b/i.test(context) ||
+            /git\s+(commit|sha|log|rev-parse)/i.test(context) ||
+            /github\.com\/[^\/]+\/[^\/]+\/(commit|tree)\//i.test(context) ||
+            /gitlab|bitbucket.*commit/i.test(context) ||
+            /submodule|checkout|branch|tag/i.test(context)
+          ) {
+            continue;
+          }
+          
+          // 2. File/content hashes
+          if (
+            /\b(checksum|hash|digest|fingerprint|etag)\b/i.test(context) ||
+            /\b(md5|sha1|sha256|sha512)\b/i.test(context) ||
+            /(file|build|content|data).{0,10}(hash|checksum)/i.test(context)
+          ) {
+            continue;
+          }
+          
+          // 3. Database/Record IDs
+          if (
+            /\b(_id|objectid|recordid|uuid|guid)\b/i.test(context) ||
+            /\b(database|mongo|dynamodb).{0,20}id/i.test(context)
+          ) {
+            continue;
+          }
+          
+          // 4. Build artifacts and version identifiers
+          if (
+            /\b(version|build|artifact|bundle|dist)\b.{0,10}:/i.test(context) ||
+            /\.(js|css|html|map)['"]?\s*:\s*['"]?[a-f0-9]{40}/i.test(context)
+          ) {
+            continue;
+          }
+          
+          // 5. Hex strings that are clearly just data (repeated patterns suggest test/dummy data)
+          // Check for patterns like '1111...', '0000...', 'aaaa...', 'ffff...'
+          if (/^(.)\1{39}$/.test(matchValue)) {
+            continue;
+          }
+          
+          // 6. Variable names clearly indicating non-secret usage
+          // Look for specific patterns in the immediate context before the hex value
+          const immediateContext = beforeMatch.slice(-40);
+          if (
+            /\b(checksum|filehash|contenthash|objectid|recordid)\b/i.test(immediateContext)
           ) {
             continue;
           }

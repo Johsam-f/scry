@@ -120,4 +120,114 @@ describe('HardcodedSecretsRule', () => {
     expect(findings[0]?.fix).toContain('process.env');
     expect(findings[0]?.fix).toContain('secrets manager');
   });
+
+  // Additional tests for improved false positive handling
+  
+  test('should NOT detect file checksums', async () => {
+    const content = `const fileChecksum = '1234567890abcdef1234567890abcdef12345678';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect content hash', async () => {
+    const content = `const contentHash = 'abcdef1234567890abcdef1234567890abcdef12';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect database record ID', async () => {
+    const content = `const recordId = 'fedcba9876543210fedcba9876543210fedcba98';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect MongoDB ObjectId', async () => {
+    const content = `const objectId = '1234567890abcdef1234567890abcdef12345678';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect build artifact hash', async () => {
+    const content = `const build = { artifact: 'abc123def456abc123def456abc123def456abc1' };`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect git sha with word boundary', async () => {
+    const content = `const sha = 'def456abc123def456abc123def456abc123def456';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect repeated character patterns', async () => {
+    const content = `const test = '0000000000000000000000000000000000000000';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should detect actual token with token variable name', async () => {
+    const content = `const githubToken = '1234567890abcdef1234567890abcdef12345678';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(1);
+    expect(findings[0]?.message).toContain('GitHub Token');
+  });
+
+  test('should detect actual token with secret variable name', async () => {
+    const content = `const apiSecret = 'fedcba9876543210fedcba9876543210fedcba98';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(1);
+    expect(findings[0]?.message).toContain('GitHub Token');
+  });
+
+  test('should detect token in config object', async () => {
+    const content = `const config = { secret: '9876543210fedcba9876543210fedcba98765432' };`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(1);
+    expect(findings[0]?.message).toContain('GitHub Token');
+  });
+
+  test('should NOT detect git log output', async () => {
+    const content = `console.log('commit 1234567890abcdef1234567890abcdef12345678');`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect GitHub URL with commit', async () => {
+    const content = `const url = 'https://github.com/user/repo/commit/abc123def456abc123def456abc123def456abc1';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect revision property', async () => {
+    const content = `const build = { revision: 'def456abc123def456abc123def456abc123def456' };`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect MD5 hash context', async () => {
+    const content = `const md5 = '1234567890abcdef1234567890abcdef12345678';`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
+
+  test('should NOT detect SHA256 context', async () => {
+    const content = `// SHA256: fedcba9876543210fedcba9876543210fedcba98`;
+    const findings = await rule.check(content, 'test.ts');
+    
+    expect(findings.length).toBe(0);
+  });
 });
