@@ -16,7 +16,7 @@ program
 program
   .command('scan [path]')
   .description('Scan a directory for security issues')
-  .option('-o, --output <format>', 'Output format (table, json, markdown)', 'table')
+  .option('-o, --output <format>', 'Output format (table, compact, json, markdown)', 'table')
   .option('--strict', 'Enable strict mode (fail on any finding)')
   .option('--min-severity <level>', 'Minimum severity to report (low, medium, high)', 'low')
   .option('--config <path>', 'Path to config file')
