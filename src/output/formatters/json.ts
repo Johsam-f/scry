@@ -4,6 +4,8 @@ export function formatAsJSON(findings: Finding[], filesScanned: number, duration
   const result: ScanResult = {
     findings,
     filesScanned,
+    filesSkipped: 0,
+    skippedFiles: [],
     duration,
     timestamp: new Date()
   };

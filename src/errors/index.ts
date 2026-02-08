@@ -8,7 +8,7 @@
 export class ScryError extends Error {
   public readonly code: string;
   public readonly context?: Record<string, unknown>;
-  public readonly cause?: Error;
+  public override readonly cause?: Error;
 
   constructor(
     message: string,
