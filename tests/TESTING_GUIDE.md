@@ -64,23 +64,23 @@ tests/fixtures/
 Each test file follows this pattern:
 
 ```typescript
-import { describe, test, expect } from "bun:test";
-import { RuleName } from "../../src/rules/ruleName";
+import { describe, test, expect } from 'bun:test';
+import { RuleName } from '../../src/rules/ruleName';
 
-describe("RuleName", () => {
+describe('RuleName', () => {
   const rule = new RuleName();
 
-  test("should detect [vulnerability]", async () => {
+  test('should detect [vulnerability]', async () => {
     const content = `vulnerable code`;
-    const findings = await rule.check(content, "test.ts");
+    const findings = await rule.check(content, 'test.ts');
 
     expect(findings.length).toBe(1);
-    expect(findings[0]?.message).toContain("expected message");
+    expect(findings[0]?.message).toContain('expected message');
   });
 
-  test("should NOT flag [safe pattern]", async () => {
+  test('should NOT flag [safe pattern]', async () => {
     const content = `safe code`;
-    const findings = await rule.check(content, "test.ts");
+    const findings = await rule.check(content, 'test.ts');
 
     expect(findings.length).toBe(0);
   });
@@ -108,7 +108,7 @@ describe("RuleName", () => {
 ```typescript
 // Should find the issue
 const content = `const API_KEY = 'sk_live_...';`;
-const findings = await rule.check(content, "test.ts");
+const findings = await rule.check(content, 'test.ts');
 expect(findings.length).toBeGreaterThan(0);
 ```
 
@@ -117,7 +117,7 @@ expect(findings.length).toBeGreaterThan(0);
 ```typescript
 // Should NOT flag safe code
 const content = `const API_KEY = process.env.API_KEY;`;
-const findings = await rule.check(content, "test.ts");
+const findings = await rule.check(content, 'test.ts');
 expect(findings.length).toBe(0);
 ```
 
@@ -125,8 +125,8 @@ expect(findings.length).toBe(0);
 
 ```typescript
 // Should suggest remediation
-expect(findings[0]?.remediation).toContain("process.env");
-expect(findings[0]?.severity).toBe("high");
+expect(findings[0]?.remediation).toContain('process.env');
+expect(findings[0]?.severity).toBe('high');
 ```
 
 ## Test Fixtures for Reference
