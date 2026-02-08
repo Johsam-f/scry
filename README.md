@@ -224,4 +224,4 @@ See [Copilot Impact Documentation](docs/COPILOT_IMPACT.md) for detailed informat
 
 **Built for the GitHub Copilot CLI Challenge**
 
-Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/copilot working](docs/copilot%20working)
+Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/copilot workings](docs/copilot%20workings)
