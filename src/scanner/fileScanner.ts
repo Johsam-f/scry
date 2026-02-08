@@ -13,7 +13,11 @@ export interface ScanOptions {
 
 // Scan directory or single file for matching files
 export async function scanFiles(options: ScanOptions): Promise<string[]> {
-  const { path, ignore: ignorePatterns = [], extensions = ['.js', '.ts', '.jsx', '.tsx'] } = options;
+  const {
+    path,
+    ignore: ignorePatterns = [],
+    extensions = ['.js', '.ts', '.jsx', '.tsx'],
+  } = options;
 
   // Check if path is a file or directory
   let stats;
@@ -32,26 +36,23 @@ export async function scanFiles(options: ScanOptions): Promise<string[]> {
       }
     }
     const cause = error instanceof Error ? error : new Error(String(error));
-    throw new FileError(
-      `Path not found`,
-      { path, triedExtensions: extensions },
-      cause
-    );
+    throw new FileError(`Path not found`, { path, triedExtensions: extensions }, cause);
   }
 
   // If it's a file, return just that file
   if (stats.isFile()) {
     const filePath = resolve(path);
     const ext = getFileExtension(filePath);
-    
+
     // Check if file has a valid extension
     if (!extensions.includes(ext)) {
-      throw new FileError(
-        `File extension not supported`,
-        { path: filePath, extension: ext, supportedExtensions: extensions }
-      );
+      throw new FileError(`File extension not supported`, {
+        path: filePath,
+        extension: ext,
+        supportedExtensions: extensions,
+      });
     }
-    
+
     return [filePath];
   }
 
@@ -66,10 +67,10 @@ export async function scanFiles(options: ScanOptions): Promise<string[]> {
       '**/.git/**',
       '**/.next/**',
       '**/coverage/**',
-      ...ignorePatterns
+      ...ignorePatterns,
     ],
     absolute: true,
-    nodir: true
+    nodir: true,
   });
 
   return files;
@@ -81,11 +82,7 @@ export async function readFileContent(filePath: string): Promise<string> {
     return await readFile(filePath, 'utf-8');
   } catch (error) {
     const cause = error instanceof Error ? error : new Error(String(error));
-    throw new FileError(
-      `Failed to read file`,
-      { filePath, error: cause.message },
-      cause
-    );
+    throw new FileError(`Failed to read file`, { filePath, error: cause.message }, cause);
   }
 }
 
@@ -102,7 +99,7 @@ export function shouldScanFile(
   ignorePatterns: string[]
 ): boolean {
   const ext = getFileExtension(filePath);
-  
+
   if (!extensions.includes(ext)) {
     return false;
   }

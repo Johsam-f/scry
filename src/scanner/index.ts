@@ -16,15 +16,20 @@ export class Scanner {
   }
 
   // Scan a directory for security issues
-  async scan(path: string): Promise<{ findings: Finding[]; filesScanned: number; filesSkipped: number; skippedFiles: Array<{ file: string; reason: string }> }> {
+  async scan(path: string): Promise<{
+    findings: Finding[];
+    filesScanned: number;
+    filesSkipped: number;
+    skippedFiles: Array<{ file: string; reason: string }>;
+  }> {
     const spinner = ora('Scanning files...').start();
 
     try {
       // Get files to scan
-      const files = await scanFiles({ 
+      const files = await scanFiles({
         path,
         ignore: this.config.ignore,
-        extensions: this.config.extensions
+        extensions: this.config.extensions,
       });
 
       if (files.length === 0) {
@@ -33,7 +38,7 @@ export class Scanner {
           findings: [],
           filesScanned: 0,
           filesSkipped: 0,
-          skippedFiles: []
+          skippedFiles: [],
         };
       }
 
@@ -51,13 +56,13 @@ export class Scanner {
 
           // Get enabled rules
           const enabledRules = Array.from(this.rules.values()).filter((rule) => rule.enabled);
-          
+
           if (enabledRules.length === 0) {
             throw new ScanError('No rules enabled for scanning', { path, enabledRules: 0 });
           }
 
           // Run enabled rules in parallel
-          const rulePromises = enabledRules.map((rule) => 
+          const rulePromises = enabledRules.map((rule) =>
             rule.check(content, filePath).catch((error) => {
               // Wrap rule errors with context
               const ruleError = new RuleError(
@@ -70,7 +75,7 @@ export class Scanner {
           );
 
           const results = await Promise.allSettled(rulePromises);
-          
+
           // Collect successful results and log failures
           const findings: Finding[] = [];
           results.forEach((result, i) => {
@@ -80,9 +85,10 @@ export class Scanner {
               // Log rule failure but continue scanning
               const rule = enabledRules[i];
               if (!rule) return;
-              const errorMsg = result.reason instanceof Error ? result.reason.message : String(result.reason);
+              const errorMsg =
+                result.reason instanceof Error ? result.reason.message : String(result.reason);
               spinner.warn(`Rule "${rule.id}" failed for ${filePath}: ${errorMsg}`);
-              
+
               if (process.env.VERBOSE && result.reason instanceof Error && result.reason.stack) {
                 console.error(`  Stack: ${result.reason.stack.split('\n').slice(0, 3).join('\n')}`);
               }
@@ -102,10 +108,11 @@ export class Scanner {
         }
       }
 
-      const successMsg = filesScanned === files.length
-        ? `Scan complete. Scanned ${filesScanned} files, found ${allFindings.length} issues.`
-        : `Scan complete. Scanned ${filesScanned}/${files.length} files (${skippedFiles.length} skipped), found ${allFindings.length} issues.`;
-      
+      const successMsg =
+        filesScanned === files.length
+          ? `Scan complete. Scanned ${filesScanned} files, found ${allFindings.length} issues.`
+          : `Scan complete. Scanned ${filesScanned}/${files.length} files (${skippedFiles.length} skipped), found ${allFindings.length} issues.`;
+
       spinner.succeed(successMsg);
 
       // Log skipped files summary if any
@@ -122,16 +129,16 @@ export class Scanner {
         findings: allFindings,
         filesScanned,
         filesSkipped: skippedFiles.length,
-        skippedFiles
+        skippedFiles,
       };
     } catch (error) {
       spinner.fail(`Scan failed`);
-      
+
       // Wrap the error with scan context
       if (error instanceof ScanError) {
         throw error;
       }
-      
+
       throw wrapError(error, 'Scan operation failed', { path, configuredRules: this.rules.size });
     }
   }
@@ -141,7 +148,7 @@ export class Scanner {
     const severityLevels: Record<Severity, number> = {
       high: 3,
       medium: 2,
-      low: 1
+      low: 1,
     };
 
     const minLevel = severityLevels[this.config.minSeverity];

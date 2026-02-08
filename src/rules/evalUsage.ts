@@ -12,23 +12,23 @@ export class EvalUsageRule extends BaseRule {
     {
       name: 'eval()',
       pattern: /\beval\s*\(/g,
-      description: 'Direct eval() call'
+      description: 'Direct eval() call',
     },
     {
       name: 'Function constructor',
       pattern: /new\s+Function\s*\(/g,
-      description: 'Function constructor (similar to eval)'
+      description: 'Function constructor (similar to eval)',
     },
     {
       name: 'setTimeout with string',
       pattern: /setTimeout\s*\(\s*['"`][^'"`]+['"`]/g,
-      description: 'setTimeout with string argument'
+      description: 'setTimeout with string argument',
     },
     {
       name: 'setInterval with string',
       pattern: /setInterval\s*\(\s*['"`][^'"`]+['"`]/g,
-      description: 'setInterval with string argument'
-    }
+      description: 'setInterval with string argument',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -42,7 +42,7 @@ export class EvalUsageRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 

@@ -10,12 +10,7 @@ export class ScryError extends Error {
   public readonly context?: Record<string, unknown>;
   public override readonly cause?: Error;
 
-  constructor(
-    message: string,
-    code: string,
-    context?: Record<string, unknown>,
-    cause?: Error
-  ) {
+  constructor(message: string, code: string, context?: Record<string, unknown>, cause?: Error) {
     super(message);
     this.name = 'ScryError';
     this.code = code;
@@ -33,7 +28,7 @@ export class ScryError extends Error {
    */
   toDetailedString(): string {
     let output = `${this.name} [${this.code}]: ${this.message}\n`;
-    
+
     if (this.context && Object.keys(this.context).length > 0) {
       output += '\nContext:\n';
       for (const [key, value] of Object.entries(this.context)) {
@@ -104,9 +99,9 @@ export function formatError(error: unknown, verbose: boolean = false): string {
     if (verbose) {
       return error.toDetailedString();
     }
-    
+
     let output = `${error.name}: ${error.message}`;
-    
+
     if (error.context) {
       const contextKeys = Object.keys(error.context);
       if (contextKeys.length > 0) {
@@ -119,7 +114,7 @@ export function formatError(error: unknown, verbose: boolean = false): string {
         }
       }
     }
-    
+
     return output;
   }
 

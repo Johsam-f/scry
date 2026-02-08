@@ -16,7 +16,7 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
 
     // Get all rules and apply config
     let rules = getAllRules();
-    
+
     // Apply rule configurations from config file
     if (Object.keys(config.rules).length > 0) {
       rules = ConfigLoader.applyRuleConfigs(rules, config.rules);
@@ -37,7 +37,7 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       showExplanations: config.showExplanations,
       showFixes: config.showFixes,
       filesSkipped: result.filesSkipped,
-      skippedFiles: result.skippedFiles
+      skippedFiles: result.skippedFiles,
     });
 
     console.log(output);
@@ -50,12 +50,14 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
     // Format and display error with context
     const errorOutput = formatError(error, verbose);
     console.error(`\n${logSymbols.error} ${errorOutput}`);
-    
+
     // Show hint about verbose mode if not already enabled
     if (!verbose) {
-      console.error(`\n${logSymbols.info} Tip: Set VERBOSE=1 environment variable for detailed error information`);
+      console.error(
+        `\n${logSymbols.info} Tip: Set VERBOSE=1 environment variable for detailed error information`
+      );
     }
-    
+
     process.exit(1);
   }
 }

@@ -18,26 +18,26 @@ export class EnvExposureRule extends BaseRule {
       name: 'Static .env serving',
       pattern: /(?:express\.static|serve-static|app\.use)\s*\([^)]*['".]env/gi,
       severity: 'critical' as const,
-      message: '.env file potentially served as static content'
+      message: '.env file potentially served as static content',
     },
     {
       name: '.env in public directory reference',
       pattern: /(?:public|static|dist|build)\/\.env/gi,
       severity: 'high' as const,
-      message: '.env file referenced in public/static directory'
+      message: '.env file referenced in public/static directory',
     },
     {
       name: 'Reading .env in client code',
       pattern: /(?:fetch|axios|http\.get|XMLHttpRequest)\s*\([^)]*['"`]\.env['"`]/gi,
       severity: 'high' as const,
-      message: 'Attempting to fetch .env file from client-side code'
+      message: 'Attempting to fetch .env file from client-side code',
     },
     {
       name: '.env file path in code',
       pattern: /['"]\/?\.env(?:\.local|\.production|\.development)?['"]/gi,
       severity: 'low' as const,
-      message: '.env file path reference in code (review context)'
-    }
+      message: '.env file path reference in code (review context)',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -51,7 +51,7 @@ export class EnvExposureRule extends BaseRule {
         file: filePath,
         line: 1,
         column: 1,
-        message: 'Environment file detected - ensure it\'s in .gitignore',
+        message: "Environment file detected - ensure it's in .gitignore",
         snippet: '',
         explanation: `Environment files (.env, .env.local, .env.production) contain sensitive configuration and secrets. These files should:
 
@@ -95,7 +95,7 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
    - Platform environment variables (Vercel, Netlify, Railway)
    - Secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
    - CI/CD secret storage (GitHub Secrets, GitLab CI/CD Variables)`,
-        tags: this.tags
+        tags: this.tags,
       });
       return findings;
     }
@@ -108,7 +108,7 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 
@@ -123,7 +123,10 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
         // For low severity patterns, check context
         if (patternConfig.severity === 'low') {
           // Skip if it's just loading dotenv
-          if (content.includes('dotenv') && content.substring(match.index - 50, match.index + 50).includes('dotenv')) {
+          if (
+            content.includes('dotenv') &&
+            content.substring(match.index - 50, match.index + 50).includes('dotenv')
+          ) {
             continue;
           }
         }

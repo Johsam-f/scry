@@ -14,24 +14,20 @@ export class JWTStorageRule extends BaseRule {
   private patterns = [
     {
       name: 'localStorage',
-      pattern:
-        /localStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi
+      pattern: /localStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi,
     },
     {
       name: 'sessionStorage',
-      pattern:
-        /sessionStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi
+      pattern: /sessionStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi,
     },
     {
       name: 'localStorage.getItem',
-      pattern:
-        /localStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi
+      pattern: /localStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi,
     },
     {
       name: 'sessionStorage.getItem',
-      pattern:
-        /sessionStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi
-    }
+      pattern: /sessionStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi,
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -45,7 +41,7 @@ export class JWTStorageRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 

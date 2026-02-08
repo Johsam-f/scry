@@ -14,20 +14,35 @@ export interface RenderOptions {
   skippedFiles?: Array<{ file: string; reason: string }>;
 }
 
-export function render(findings: Finding[], filesScanned: number, duration: number, options: RenderOptions): string {
-  const { format, showSummary = true, showExplanations = false, showFixes = false, filesSkipped = 0, skippedFiles = [] } = options;
+export function render(
+  findings: Finding[],
+  filesScanned: number,
+  duration: number,
+  options: RenderOptions
+): string {
+  const {
+    format,
+    showSummary = true,
+    showExplanations = false,
+    showFixes = false,
+    filesSkipped = 0,
+    skippedFiles = [],
+  } = options;
 
   let output = '';
 
   switch (format) {
     case 'json':
-      output = options.detailed ? formatDetailedJSON(findings) : formatAsJSON(findings, filesScanned, duration);
+      output = options.detailed
+        ? formatDetailedJSON(findings)
+        : formatAsJSON(findings, filesScanned, duration);
       break;
 
     case 'markdown':
-      output = (showExplanations || showFixes) 
-        ? formatDetailedMarkdown(findings, filesScanned, duration)
-        : formatAsMarkdown(findings, filesScanned, duration);
+      output =
+        showExplanations || showFixes
+          ? formatDetailedMarkdown(findings, filesScanned, duration)
+          : formatAsMarkdown(findings, filesScanned, duration);
       break;
 
     case 'compact':

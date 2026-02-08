@@ -7,7 +7,7 @@ export function formatAsJSON(findings: Finding[], filesScanned: number, duration
     filesSkipped: 0,
     skippedFiles: [],
     duration,
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 
   return JSON.stringify(result, null, 2);
@@ -18,7 +18,7 @@ export function formatDetailedJSON(findings: Finding[]): string {
   const bySeverity: Record<string, Finding[]> = {
     high: [],
     medium: [],
-    low: []
+    low: [],
   };
 
   for (const finding of findings) {
@@ -36,7 +36,7 @@ export function formatDetailedJSON(findings: Finding[]): string {
     {
       total: findings.length,
       byRule,
-      bySeverity
+      bySeverity,
     },
     null,
     2

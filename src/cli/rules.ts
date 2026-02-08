@@ -19,7 +19,7 @@ export function getAllRules(): Rule[] {
     new CORSConfigRule(),
     new EnvExposureRule(),
     new WeakCryptoRule(),
-    new PasswordSecurityRule()
+    new PasswordSecurityRule(),
   ];
 }
 

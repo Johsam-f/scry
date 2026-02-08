@@ -18,39 +18,41 @@ export class CORSConfigRule extends BaseRule {
       name: 'Wildcard CORS',
       pattern: /(?:Access-Control-Allow-Origin|origin)\s*[:=]\s*['"`]\*['"`]/gi,
       severity: 'high' as const,
-      message: 'Wildcard (*) CORS origin allows any website to access your API'
+      message: 'Wildcard (*) CORS origin allows any website to access your API',
     },
     {
       name: 'CORS with credentials and wildcard',
       pattern: /Access-Control-Allow-Credentials\s*[:=]\s*['"`]?true['"`]?/gi,
       severity: 'high' as const,
       message: 'CORS credentials enabled - check if wildcard origin is used',
-      needsSecondCheck: true
+      needsSecondCheck: true,
     },
     {
       name: 'Reflected origin without validation',
-      pattern: /(?:Access-Control-Allow-Origin|setHeader\s*\(\s*['"`]Access-Control-Allow-Origin['"`])\s*[,:]\s*(?:req\.headers?\.origin|origin)/gi,
+      pattern:
+        /(?:Access-Control-Allow-Origin|setHeader\s*\(\s*['"`]Access-Control-Allow-Origin['"`])\s*[,:]\s*(?:req\.headers?\.origin|origin)/gi,
       severity: 'high' as const,
-      message: 'CORS origin reflects request origin without validation'
+      message: 'CORS origin reflects request origin without validation',
     },
     {
       name: 'Express CORS wildcard',
       pattern: /cors\s*\(\s*\{\s*origin\s*:\s*['"`]\*['"`]/gi,
       severity: 'high' as const,
-      message: 'Express CORS configured with wildcard origin'
+      message: 'Express CORS configured with wildcard origin',
     },
     {
       name: 'Express CORS permissive function',
-      pattern: /cors\s*\(\s*\{\s*origin\s*:\s*(?:function|=>|\([^)]{0,100}\)\s*=>)[^}]{0,500}return\s+true/gi,
+      pattern:
+        /cors\s*\(\s*\{\s*origin\s*:\s*(?:function|=>|\([^)]{0,100}\)\s*=>)[^}]{0,500}return\s+true/gi,
       severity: 'medium' as const,
-      message: 'CORS origin function always returns true'
+      message: 'CORS origin function always returns true',
     },
     {
       name: 'Null origin allowed',
       pattern: /(?:Access-Control-Allow-Origin|origin)\s*[:=]\s*['"`]null['"`]/gi,
       severity: 'medium' as const,
-      message: 'CORS allows null origin (exploitable via sandboxed iframes)'
-    }
+      message: 'CORS allows null origin (exploitable via sandboxed iframes)',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -68,7 +70,7 @@ export class CORSConfigRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 

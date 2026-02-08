@@ -11,53 +11,56 @@ export class PasswordSecurityRule extends BaseRule {
   private patterns = [
     {
       name: 'Plaintext password storage',
-      pattern: /(?:password|passwd|pwd)\s*[=:]\s*['"`][^'"`]+['"`]|\.password\s*=|database\.insert\s*\([^)]*password[^)]*\)/gi,
+      pattern:
+        /(?:password|passwd|pwd)\s*[=:]\s*['"`][^'"`]+['"`]|\.password\s*=|database\.insert\s*\([^)]*password[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password appears to be stored or transmitted in plaintext',
       category: 'storage',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Password in URL',
       pattern: /(?:https?|ftp):\/\/[^:]+:([^@\s]+)@/gi,
       severity: 'high' as const,
       message: 'Password in URL (credentials should not be in URLs)',
-      category: 'url'
+      category: 'url',
     },
     {
       name: 'Password logging',
-      pattern: /(?:console\.log|logger\.(?:info|debug|warn|error))\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
+      pattern:
+        /(?:console\.log|logger\.(?:info|debug|warn|error))\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password may be logged (never log passwords)',
-      category: 'logging'
+      category: 'logging',
     },
     {
       name: 'Weak password validation',
       pattern: /password\.length\s*[<>=!]+\s*[1-7]\b/gi,
       severity: 'medium' as const,
       message: 'Password length requirement is too short (minimum 8 characters)',
-      category: 'validation'
+      category: 'validation',
     },
     {
       name: 'No password validation',
-      pattern: /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=\(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
+      pattern:
+        /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=\(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
       severity: 'high' as const,
       message: 'Password validation function always returns true',
-      category: 'validation'
+      category: 'validation',
     },
     {
       name: 'Password in GET request',
       pattern: /(?:axios|fetch|request)\.get\s*\([^)]*[?&](?:password|passwd|pwd)=/gi,
       severity: 'high' as const,
       message: 'Password sent via GET request (use POST with body)',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password in query string',
       pattern: /(?:query|params|searchParams)\s*=\s*[^;]*[?&](?:password|passwd|pwd)=/gi,
       severity: 'high' as const,
       message: 'Password in query string (passwords should be in request body)',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password comparison without timing safety',
@@ -65,7 +68,7 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Direct password comparison (vulnerable to timing attacks)',
       category: 'comparison',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Missing password complexity',
@@ -73,42 +76,44 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'low' as const,
       message: 'Check if password regex enforces sufficient complexity',
       category: 'validation',
-      isLowRisk: true
+      isLowRisk: true,
     },
     {
       name: 'Password in localStorage',
       pattern: /localStorage\.(?:setItem|set)\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password stored in localStorage (never store passwords in browser storage)',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Password in sessionStorage',
       pattern: /sessionStorage\.(?:setItem|set)\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password stored in sessionStorage (never store passwords in browser storage)',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Password in cookies without secure flags',
-      pattern: /(?:document\.cookie|res\.cookie)\s*[=\(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
+      pattern:
+        /(?:document\.cookie|res\.cookie)\s*[=\(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
       severity: 'high' as const,
       message: 'Password in cookie without secure/httpOnly flags',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Hardcoded default password',
-      pattern: /(?:default|initial|temp|temporary)(?:Password|Passwd|Pwd)\s*[=:]\s*['"`][^'"`]+['"`]/gi,
+      pattern:
+        /(?:default|initial|temp|temporary)(?:Password|Passwd|Pwd)\s*[=:]\s*['"`][^'"`]+['"`]/gi,
       severity: 'high' as const,
       message: 'Hardcoded default password (security risk)',
-      category: 'hardcoded'
+      category: 'hardcoded',
     },
     {
       name: 'Password sent over HTTP',
       pattern: /http:\/\/[^\/]+\/[^\s]*(?:login|auth|signin|password)/gi,
       severity: 'high' as const,
       message: 'Authentication endpoint uses HTTP instead of HTTPS',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password autocomplete enabled',
@@ -116,8 +121,8 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'low' as const,
       message: 'Password field has autocomplete enabled explicitly',
       category: 'ui',
-      isLowRisk: true
-    }
+      isLowRisk: true,
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -131,13 +136,13 @@ export class PasswordSecurityRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 
       for (const match of matches) {
         const lineNumber = this.getLineNumber(content, match.index);
-        
+
         // Skip if in comment using robust detection from base class
         if (this.isInComment(content, match.index)) {
           continue;
@@ -152,13 +157,26 @@ export class PasswordSecurityRule extends BaseRule {
         if (patternConfig.needsContext && patternConfig.category === 'storage') {
           // Check if password is being hashed
           const contextBefore = content.substring(Math.max(0, match.index - 200), match.index);
-          const contextAfter = content.substring(match.index, Math.min(content.length, match.index + 200));
+          const contextAfter = content.substring(
+            match.index,
+            Math.min(content.length, match.index + 200)
+          );
           const fullContext = contextBefore + contextAfter;
-          
+
           // Skip if hashing/encryption is present
-          const secureKeywords = ['hash', 'bcrypt', 'scrypt', 'argon2', 'encrypt', 'crypto', 'pbkdf2'];
-          const hasSecureHandling = secureKeywords.some(keyword => fullContext.toLowerCase().includes(keyword));
-          
+          const secureKeywords = [
+            'hash',
+            'bcrypt',
+            'scrypt',
+            'argon2',
+            'encrypt',
+            'crypto',
+            'pbkdf2',
+          ];
+          const hasSecureHandling = secureKeywords.some((keyword) =>
+            fullContext.toLowerCase().includes(keyword)
+          );
+
           if (hasSecureHandling) {
             continue;
           }
@@ -166,12 +184,22 @@ export class PasswordSecurityRule extends BaseRule {
 
         // Context-aware checking for password comparison
         if (patternConfig.needsContext && patternConfig.category === 'comparison') {
-          const contextWindow = content.substring(Math.max(0, match.index - 100), Math.min(content.length, match.index + 100));
-          
+          const contextWindow = content.substring(
+            Math.max(0, match.index - 100),
+            Math.min(content.length, match.index + 100)
+          );
+
           // Skip if using secure comparison methods
-          const secureComparison = ['bcrypt.compare', 'crypto.timingSafeEqual', 'verify', 'compareSync'];
-          const hasSecureComparison = secureComparison.some(method => contextWindow.includes(method));
-          
+          const secureComparison = [
+            'bcrypt.compare',
+            'crypto.timingSafeEqual',
+            'verify',
+            'compareSync',
+          ];
+          const hasSecureComparison = secureComparison.some((method) =>
+            contextWindow.includes(method)
+          );
+
           if (hasSecureComparison) {
             continue;
           }

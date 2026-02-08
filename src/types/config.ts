@@ -33,12 +33,12 @@ export const defaultConfig: ScryConfig = {
     '**/build/**',
     '**/.git/**',
     '**/.next/**',
-    '**/coverage/**'
+    '**/coverage/**',
   ],
   extensions: ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.cjs'],
   output: 'table',
   strict: false,
   minSeverity: 'low',
   showFixes: true,
-  showExplanations: true
+  showExplanations: true,
 };

@@ -19,28 +19,28 @@ export class WeakCryptoRule extends BaseRule {
       pattern: /createHash\s*\(\s*['"`]md5['"`]\s*\)|\.update\(['"`]md5['"`]\)|md5\s*\(/gi,
       severity: 'high' as const,
       message: 'MD5 is cryptographically broken and should not be used',
-      algorithm: 'MD5'
+      algorithm: 'MD5',
     },
     {
       name: 'SHA1 usage',
       pattern: /createHash\s*\(\s*['"`]sha1['"`]\s*\)|sha1\s*\(/gi,
       severity: 'high' as const,
       message: 'SHA1 is cryptographically weak and should not be used',
-      algorithm: 'SHA1'
+      algorithm: 'SHA1',
     },
     {
       name: 'DES/3DES encryption',
       pattern: /createCipher(?:iv)?\s*\(\s*['"`](?:des|des-ede|des-ede3|des3)['"`]/gi,
       severity: 'high' as const,
       message: 'DES/3DES encryption is obsolete and insecure',
-      algorithm: 'DES'
+      algorithm: 'DES',
     },
     {
       name: 'ECB mode',
       pattern: /createCipher(?:iv)?\s*\(\s*['"`][^'"`]*-ecb[^'"`]*['"`]/gi,
       severity: 'high' as const,
       message: 'ECB mode is insecure (leaks patterns in encrypted data)',
-      algorithm: 'ECB'
+      algorithm: 'ECB',
     },
     {
       name: 'Weak random - Math.random()',
@@ -48,14 +48,14 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Math.random() is not cryptographically secure',
       algorithm: 'Math.random',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Unsalted hash',
       pattern: /(?:createHash|bcrypt|scrypt)\s*\([^)]*\)\.update\s*\(\s*password\s*\)\.digest/gi,
       severity: 'high' as const,
       message: 'Password hashing without salt is vulnerable to rainbow tables',
-      algorithm: 'unsalted'
+      algorithm: 'unsalted',
     },
     {
       name: 'Low bcrypt rounds',
@@ -63,7 +63,7 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Bcrypt rounds may be too low (check value)',
       algorithm: 'bcrypt',
-      checkRounds: true
+      checkRounds: true,
     },
     {
       name: 'Weak PBKDF2 iterations',
@@ -71,15 +71,15 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'PBKDF2 iterations may be too low (check value)',
       algorithm: 'pbkdf2',
-      checkIterations: true
+      checkIterations: true,
     },
     {
       name: 'Hardcoded IV/Salt',
       pattern: /(?:const|let|var)\s+(?:iv|salt)\s*=\s*['"`][a-fA-F0-9]{16,}['"`]/gi,
       severity: 'high' as const,
       message: 'Hardcoded IV or salt defeats encryption security',
-      algorithm: 'hardcoded-iv'
-    }
+      algorithm: 'hardcoded-iv',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -93,7 +93,7 @@ export class WeakCryptoRule extends BaseRule {
     for (const patternConfig of this.patterns) {
       // Create a fresh regex instance to avoid state issues
       const pattern = this.createRegex(patternConfig.pattern);
-      
+
       // Use timeout-protected execution for safety
       const matches = this.execWithTimeout(pattern, content);
 
@@ -107,10 +107,25 @@ export class WeakCryptoRule extends BaseRule {
 
         // Special handling for Math.random() - only flag in security contexts
         if (patternConfig.needsContext) {
-          const contextWindow = content.substring(Math.max(0, match.index - 100), match.index + 100).toLowerCase();
-          const securityKeywords = ['password', 'token', 'secret', 'key', 'salt', 'nonce', 'iv', 'crypto', 'session', 'auth'];
-          const hasSecurityContext = securityKeywords.some(keyword => contextWindow.includes(keyword));
-          
+          const contextWindow = content
+            .substring(Math.max(0, match.index - 100), match.index + 100)
+            .toLowerCase();
+          const securityKeywords = [
+            'password',
+            'token',
+            'secret',
+            'key',
+            'salt',
+            'nonce',
+            'iv',
+            'crypto',
+            'session',
+            'auth',
+          ];
+          const hasSecurityContext = securityKeywords.some((keyword) =>
+            contextWindow.includes(keyword)
+          );
+
           if (!hasSecurityContext) {
             continue; // Skip if not in security context
           }
