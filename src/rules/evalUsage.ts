@@ -5,7 +5,7 @@ export class EvalUsageRule extends BaseRule {
   override id = 'eval-usage';
   override name = 'eval() Usage';
   override description = 'Detects dangerous eval() and similar code execution methods';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'code-injection'];
 
   private patterns = [

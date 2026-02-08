@@ -16,7 +16,7 @@ export class CookieSecurityRule extends BaseRule {
   override id = 'cookie-security';
   override name = 'Insecure Cookie Configuration';
   override description = 'Detects cookies set without HttpOnly and Secure flags';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'cookies', 'auth'];
 
   private patterns = [
@@ -115,8 +115,6 @@ export class CookieSecurityRule extends BaseRule {
 
         // Only report if flags are missing
         if (missingFlags.length > 0) {
-          const severity = this.getSeverity(flags);
-
           findings.push(
             this.createFinding(
               `Cookie '${flags.cookieName}' missing ${missingFlags.join(' and ')} flag${missingFlags.length > 1 ? 's' : ''}`,

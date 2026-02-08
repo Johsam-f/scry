@@ -26,10 +26,12 @@ export function formatDetailedJSON(findings: Finding[]): string {
     if (!byRule[finding.rule]) {
       byRule[finding.rule] = [];
     }
-    byRule[finding.rule]!.push(finding);
+    const ruleArray = byRule[finding.rule];
+    if (ruleArray) ruleArray.push(finding);
 
     // Group by severity
-    bySeverity[finding.severity]!.push(finding);
+    const severityArray = bySeverity[finding.severity];
+    if (severityArray) severityArray.push(finding);
   }
 
   return JSON.stringify(

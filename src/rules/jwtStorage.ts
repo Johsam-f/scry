@@ -8,7 +8,7 @@ export class JWTStorageRule extends BaseRule {
   override id = 'jwt-storage';
   override name = 'JWT in Client Storage';
   override description = 'Detects JWT tokens stored in localStorage or sessionStorage';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'auth', 'storage'];
 
   private patterns = [

@@ -10,7 +10,7 @@ export class WeakCryptoRule extends BaseRule {
   override id = 'weak-crypto';
   override name = 'Weak Cryptography';
   override description = 'Detects use of weak or broken cryptographic algorithms';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'cryptography', 'hashing'];
 
   private patterns = [

@@ -10,7 +10,7 @@ export class EnvExposureRule extends BaseRule {
   override id = 'env-exposure';
   override name = '.env File Exposure';
   override description = 'Detects potential .env file exposure risks';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'secrets', 'configuration'];
 
   private patterns = [

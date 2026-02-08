@@ -1,8 +1,7 @@
 import { glob } from 'glob';
 import { readFile, stat } from 'fs/promises';
-import type { Ignore } from 'ignore';
 import ignore from 'ignore';
-import { join, resolve, extname } from 'path';
+import { resolve } from 'path';
 import { FileError } from '../errors';
 
 export interface ScanOptions {

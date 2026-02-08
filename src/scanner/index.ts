@@ -1,5 +1,5 @@
 import type { Finding, Rule, Severity, ScryConfig } from '../types';
-import { scanFiles, readFileContent, getFileExtension, shouldScanFile } from './fileScanner';
+import { scanFiles, readFileContent } from './fileScanner';
 import { ScanError, RuleError, wrapError } from '../errors';
 import ora from 'ora';
 
@@ -52,7 +52,6 @@ export class Scanner {
       for (const filePath of files) {
         try {
           const content = await readFileContent(filePath);
-          const ext = getFileExtension(filePath);
 
           // Get enabled rules
           const enabledRules = Array.from(this.rules.values()).filter((rule) => rule.enabled);

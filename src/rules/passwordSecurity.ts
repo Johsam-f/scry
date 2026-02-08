@@ -5,7 +5,7 @@ export class PasswordSecurityRule extends BaseRule {
   override id = 'password-security';
   override name = 'Password Security';
   override description = 'Detects insecure password handling and validation practices';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'passwords', 'authentication'];
 
   private patterns = [
@@ -43,7 +43,7 @@ export class PasswordSecurityRule extends BaseRule {
     {
       name: 'No password validation',
       pattern:
-        /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=\(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
+        /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
       severity: 'high' as const,
       message: 'Password validation function always returns true',
       category: 'validation',
@@ -95,7 +95,7 @@ export class PasswordSecurityRule extends BaseRule {
     {
       name: 'Password in cookies without secure flags',
       pattern:
-        /(?:document\.cookie|res\.cookie)\s*[=\(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
+        /(?:document\.cookie|res\.cookie)\s*[=(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
       severity: 'high' as const,
       message: 'Password in cookie without secure/httpOnly flags',
       category: 'storage',
@@ -110,7 +110,7 @@ export class PasswordSecurityRule extends BaseRule {
     },
     {
       name: 'Password sent over HTTP',
-      pattern: /http:\/\/[^\/]+\/[^\s]*(?:login|auth|signin|password)/gi,
+      pattern: /http:\/\/[^/]+\/[^\s]*(?:login|auth|signin|password)/gi,
       severity: 'high' as const,
       message: 'Authentication endpoint uses HTTP instead of HTTPS',
       category: 'transmission',

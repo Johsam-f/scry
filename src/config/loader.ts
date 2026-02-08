@@ -30,9 +30,8 @@ export class ConfigLoader {
    * Load configuration from file
    */
   private static loadConfigFile(configPath?: string): Partial<ScryConfig> | null {
-    let resolvedPath: string | null = null;
-
     // If config path is explicitly provided
+    let resolvedPath: string | null;
     if (configPath) {
       resolvedPath = resolve(configPath);
       if (!existsSync(resolvedPath)) {

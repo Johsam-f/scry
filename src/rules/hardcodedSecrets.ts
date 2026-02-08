@@ -10,7 +10,7 @@ export class HardcodedSecretsRule extends BaseRule {
   override id = 'hardcoded-secrets';
   override name = 'Hardcoded Secrets';
   override description = 'Detects hardcoded secrets, API keys, and credentials';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'secrets'];
 
   private patterns = [
@@ -81,7 +81,7 @@ export class HardcodedSecretsRule extends BaseRule {
           if (
             /\b(commit|sha|revision|ref)\b/i.test(context) ||
             /git\s+(commit|sha|log|rev-parse)/i.test(context) ||
-            /github\.com\/[^\/]+\/[^\/]+\/(commit|tree)\//i.test(context) ||
+            /github\.com\/[^/]+\/[^/]+\/(commit|tree)\//i.test(context) ||
             /gitlab|bitbucket.*commit/i.test(context) ||
             /submodule|checkout|branch|tag/i.test(context)
           ) {

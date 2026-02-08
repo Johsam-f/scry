@@ -25,11 +25,11 @@ export function render(
     showSummary = true,
     showExplanations = false,
     showFixes = false,
-    filesSkipped = 0,
-    skippedFiles = [],
+    filesSkipped: _filesSkipped = 0,
+    skippedFiles: _skippedFiles = [],
   } = options;
 
-  let output = '';
+  let output: string;
 
   switch (format) {
     case 'json':

@@ -10,7 +10,7 @@ export class CORSConfigRule extends BaseRule {
   override id = 'cors-config';
   override name = 'CORS Misconfiguration';
   override description = 'Detects overly permissive CORS configurations';
-  override severity: 'medium' = 'medium';
+  override severity = 'medium' as const;
   override tags = ['security', 'cors', 'web'];
 
   private patterns = [

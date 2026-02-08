@@ -22,7 +22,10 @@ export function formatAsCompact(
     if (!byFile.has(finding.file)) {
       byFile.set(finding.file, []);
     }
-    byFile.get(finding.file)!.push(finding);
+    const fileFindings = byFile.get(finding.file);
+    if (fileFindings) {
+      fileFindings.push(finding);
+    }
   }
 
   // Format each file's findings
