@@ -42,8 +42,8 @@ describe('Single File Scanning', () => {
     try {
       await scanFiles({ path: txtFile });
       expect(true).toBe(false); // Should not reach here
-    } catch (error: any) {
-      expect(error.message).toContain('not supported');
+    } catch (error: unknown) {
+      expect((error as Error).message).toContain('not supported');
     }
   });
 
@@ -51,8 +51,8 @@ describe('Single File Scanning', () => {
     try {
       await scanFiles({ path: '/non/existent/path' });
       expect(true).toBe(false); // Should not reach here
-    } catch (error: any) {
-      expect(error.message).toContain('not found');
+    } catch (error: unknown) {
+      expect((error as Error).message).toContain('not found');
     }
   });
 });

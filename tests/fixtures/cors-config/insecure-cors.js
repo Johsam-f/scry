@@ -8,14 +8,18 @@ res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
 app.use(cors({ origin: 'null' }));
 
 // CRITICAL - Wildcard with credentials
-app.use(cors({
-  origin: '*',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+  })
+);
 
 // VULNERABLE - Always allowing in function
-app.use(cors({
-  origin: function (origin, callback) {
-    callback(null, true);
-  }
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
+  })
+);

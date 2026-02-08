@@ -9,5 +9,5 @@ const corsOptions = {
   origin: (origin, callback) => {
     // Always returns true regardless of origin
     callback(null, true);
-  }
+  },
 };
