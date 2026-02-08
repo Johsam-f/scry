@@ -5,30 +5,30 @@ export class EvalUsageRule extends BaseRule {
   override id = 'eval-usage';
   override name = 'eval() Usage';
   override description = 'Detects dangerous eval() and similar code execution methods';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'code-injection'];
 
   private patterns = [
     {
       name: 'eval()',
       pattern: /\beval\s*\(/g,
-      description: 'Direct eval() call'
+      description: 'Direct eval() call',
     },
     {
       name: 'Function constructor',
       pattern: /new\s+Function\s*\(/g,
-      description: 'Function constructor (similar to eval)'
+      description: 'Function constructor (similar to eval)',
     },
     {
       name: 'setTimeout with string',
       pattern: /setTimeout\s*\(\s*['"`][^'"`]+['"`]/g,
-      description: 'setTimeout with string argument'
+      description: 'setTimeout with string argument',
     },
     {
       name: 'setInterval with string',
       pattern: /setInterval\s*\(\s*['"`][^'"`]+['"`]/g,
-      description: 'setInterval with string argument'
-    }
+      description: 'setInterval with string argument',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -40,31 +40,15 @@ export class EvalUsageRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      // Reset regex if global flag
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineEnd = content.indexOf('\n', match.index);
-        const lineContent = content.substring(lineStart, lineEnd === -1 ? content.length : lineEnd);
-
-        // Skip single-line comments
-        const beforeMatch = lineContent.substring(0, match.index - lineStart);
-        if (beforeMatch.includes('//')) {
-          continue;
-        }
-
-        // Skip multi-line comments (simple check)
-        const beforeContent = content.substring(0, match.index);
-        const lastCommentStart = beforeContent.lastIndexOf('/*');
-        const lastCommentEnd = beforeContent.lastIndexOf('*/');
-        if (lastCommentStart > lastCommentEnd) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 

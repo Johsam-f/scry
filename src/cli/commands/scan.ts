@@ -3,15 +3,20 @@ import { render } from '../../output';
 import type { CLIOptions, ScryConfig } from '../../types';
 import { getAllRules } from '../rules';
 import { loadConfig, ConfigLoader } from '../../config';
+import { formatError } from '../../errors';
+import logSymbols from 'log-symbols';
 
 export async function handleScanCommand(path: string, options: CLIOptions): Promise<void> {
+  // Check for verbose mode
+  const verbose = process.env.VERBOSE === '1' || process.env.DEBUG === '1';
+
   try {
     // Load and merge configuration from file and CLI options
     const config: ScryConfig = loadConfig(options);
 
     // Get all rules and apply config
     let rules = getAllRules();
-    
+
     // Apply rule configurations from config file
     if (Object.keys(config.rules).length > 0) {
       rules = ConfigLoader.applyRuleConfigs(rules, config.rules);
@@ -30,7 +35,9 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       format: config.output,
       showSummary: true,
       showExplanations: config.showExplanations,
-      showFixes: config.showFixes
+      showFixes: config.showFixes,
+      filesSkipped: result.filesSkipped,
+      skippedFiles: result.skippedFiles,
     });
 
     console.log(output);
@@ -40,7 +47,17 @@ export async function handleScanCommand(path: string, options: CLIOptions): Prom
       process.exit(1);
     }
   } catch (error) {
-    console.error('Error during scan:', error);
+    // Format and display error with context
+    const errorOutput = formatError(error, verbose);
+    console.error(`\n${logSymbols.error} ${errorOutput}`);
+
+    // Show hint about verbose mode if not already enabled
+    if (!verbose) {
+      console.error(
+        `\n${logSymbols.info} Tip: Set VERBOSE=1 environment variable for detailed error information`
+      );
+    }
+
     process.exit(1);
   }
 }

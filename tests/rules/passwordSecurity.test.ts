@@ -14,7 +14,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('plaintext'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('plaintext'))).toBe(true);
   });
 
   test('should detect password in URL', async () => {
@@ -24,7 +24,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('URL'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('URL'))).toBe(true);
   });
 
   test('should detect password logging', async () => {
@@ -34,7 +34,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('logged'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('logged'))).toBe(true);
   });
 
   test('should detect weak password validation (too short)', async () => {
@@ -45,7 +45,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('too short'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('too short'))).toBe(true);
   });
 
   test('should detect no password validation', async () => {
@@ -56,7 +56,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('always returns true'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('always returns true'))).toBe(true);
   });
 
   test('should detect password in GET request', async () => {
@@ -66,7 +66,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('GET request'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('GET request'))).toBe(true);
   });
 
   test('should detect password in query string', async () => {
@@ -76,7 +76,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('query string'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('query string'))).toBe(true);
   });
 
   test('should detect direct password comparison', async () => {
@@ -87,7 +87,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('timing attacks'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('timing attacks'))).toBe(true);
   });
 
   test('should detect password in localStorage', async () => {
@@ -97,7 +97,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('localStorage'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('localStorage'))).toBe(true);
   });
 
   test('should detect password in sessionStorage', async () => {
@@ -106,7 +106,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('sessionStorage'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('sessionStorage'))).toBe(true);
   });
 
   test('should detect hardcoded default password', async () => {
@@ -116,7 +116,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('default password'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('default password'))).toBe(true);
   });
 
   test('should detect password over HTTP', async () => {
@@ -128,7 +128,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.some(f => f.message.includes('HTTP'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('HTTP'))).toBe(true);
   });
 
   test('should NOT flag properly hashed passwords', async () => {
@@ -143,7 +143,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     // Should not flag the password being hashed
-    expect(findings.every(f => !f.message.includes('plaintext'))).toBe(true);
+    expect(findings.every((f) => !f.message.includes('plaintext'))).toBe(true);
   });
 
   test('should NOT flag bcrypt password comparison', async () => {
@@ -153,7 +153,7 @@ describe('PasswordSecurityRule', () => {
     `;
     const findings = await rule.check(code, 'test.js');
     // Should not flag bcrypt.compare
-    expect(findings.every(f => !f.message.includes('timing'))).toBe(true);
+    expect(findings.every((f) => !f.message.includes('timing'))).toBe(true);
   });
 
   test('should skip comments', async () => {
@@ -173,7 +173,7 @@ describe('PasswordSecurityRule', () => {
       const password = 'secret123';
       localStorage.setItem('password', password);
     `;
-    
+
     const jsFindings = await rule.check(code, 'test.js');
     expect(jsFindings.length).toBeGreaterThan(0);
 
@@ -199,10 +199,10 @@ describe('PasswordSecurityRule', () => {
       db.insert({ username: 'alice', password });
     `;
     const findings = await rule.check(code, 'test.js');
-    
+
     expect(findings.length).toBeGreaterThan(0);
     const finding = findings[0];
-    
+
     expect(finding).toBeDefined();
     expect(finding?.explanation).toBeTruthy();
     expect(finding?.explanation.length).toBeGreaterThan(50);

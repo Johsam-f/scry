@@ -14,8 +14,8 @@ export function formatAsTable(findings: Finding[]): string {
       chalk.bold('Rule'),
       chalk.bold('File'),
       chalk.bold('Line'),
-      chalk.bold('Message')
-    ]
+      chalk.bold('Message'),
+    ],
   ];
 
   for (const finding of findings) {
@@ -25,7 +25,7 @@ export function formatAsTable(findings: Finding[]): string {
       chalk.cyan(finding.rule),
       chalk.gray(finding.file),
       chalk.yellow(finding.line.toString()),
-      finding.message
+      finding.message,
     ]);
   }
 
@@ -45,11 +45,7 @@ function formatSeverity(severity: string): string {
   }
 }
 
-export function formatSummary(
-  findings: Finding[],
-  filesScanned: number,
-  duration: number
-): string {
+export function formatSummary(findings: Finding[], filesScanned: number, duration: number): string {
   const high = findings.filter((f) => f.severity === 'high').length;
   const medium = findings.filter((f) => f.severity === 'medium').length;
   const low = findings.filter((f) => f.severity === 'low').length;
@@ -65,7 +61,7 @@ export function formatSummary(
     `${chalk.yellow(`${logSymbols.warning} Medium: ${medium}`)}`,
     `${chalk.blue(`${logSymbols.info} Low: ${low}`)}`,
     `${chalk.bold('Total: ' + findings.length)}`,
-    ''
+    '',
   ];
 
   return lines.join('\n');

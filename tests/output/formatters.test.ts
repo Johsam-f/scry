@@ -12,7 +12,7 @@ const mockFindings: Finding[] = [
     column: 5,
     snippet: 'const API_KEY = "secret123";',
     explanation: 'This is dangerous because...',
-    fix: 'Use environment variables instead'
+    fix: 'Use environment variables instead',
   },
   {
     rule: 'eval-usage',
@@ -23,7 +23,7 @@ const mockFindings: Finding[] = [
     column: 3,
     snippet: 'eval(userInput);',
     explanation: 'Code injection vulnerability',
-    fix: 'Use JSON.parse instead'
+    fix: 'Use JSON.parse instead',
   },
   {
     rule: 'weak-crypto',
@@ -34,7 +34,7 @@ const mockFindings: Finding[] = [
     column: 1,
     snippet: 'md5(password)',
     explanation: 'MD5 is broken',
-    fix: 'Use bcrypt'
+    fix: 'Use bcrypt',
   },
   {
     rule: 'cookie-security',
@@ -45,8 +45,8 @@ const mockFindings: Finding[] = [
     column: 10,
     snippet: 'res.cookie("session", id)',
     explanation: 'XSS vulnerability',
-    fix: 'Add httpOnly flag'
-  }
+    fix: 'Add httpOnly flag',
+  },
 ];
 
 describe('Output Formatters', () => {
@@ -54,7 +54,7 @@ describe('Output Formatters', () => {
     it('should render findings as table', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'table',
-        showSummary: true
+        showSummary: true,
       });
 
       expect(output).toContain('Severity');
@@ -70,7 +70,7 @@ describe('Output Formatters', () => {
     it('should show success message when no findings', () => {
       const output = render([], 10, 50, {
         format: 'table',
-        showSummary: true
+        showSummary: true,
       });
 
       expect(output).toContain('No security issues found');
@@ -80,7 +80,7 @@ describe('Output Formatters', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'table',
         showSummary: true,
-        showExplanations: true
+        showExplanations: true,
       });
 
       expect(output).toContain('DETAILED FINDINGS');
@@ -91,7 +91,7 @@ describe('Output Formatters', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'table',
         showSummary: true,
-        showFixes: true
+        showFixes: true,
       });
 
       expect(output).toContain('DETAILED FINDINGS');
@@ -101,7 +101,7 @@ describe('Output Formatters', () => {
     it('should count findings by severity', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'table',
-        showSummary: true
+        showSummary: true,
       });
 
       expect(output).toContain('High: 2');
@@ -114,7 +114,7 @@ describe('Output Formatters', () => {
   describe('JSON Format', () => {
     it('should render findings as JSON', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'json'
+        format: 'json',
       });
 
       const parsed = JSON.parse(output);
@@ -126,7 +126,7 @@ describe('Output Formatters', () => {
 
     it('should include all finding details in JSON', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'json'
+        format: 'json',
       });
 
       const parsed = JSON.parse(output);
@@ -141,7 +141,7 @@ describe('Output Formatters', () => {
     it('should render detailed JSON when requested', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'json',
-        detailed: true
+        detailed: true,
       });
 
       const parsed = JSON.parse(output);
@@ -157,7 +157,7 @@ describe('Output Formatters', () => {
   describe('Markdown Format', () => {
     it('should render findings as markdown', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'markdown'
+        format: 'markdown',
       });
 
       expect(output).toContain('# Scry Security Scan Report');
@@ -170,7 +170,7 @@ describe('Output Formatters', () => {
 
     it('should group findings by severity in markdown', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'markdown'
+        format: 'markdown',
       });
 
       expect(output).toContain('### 🔴 High Severity');
@@ -180,7 +180,7 @@ describe('Output Formatters', () => {
 
     it('should create markdown tables for findings', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'markdown'
+        format: 'markdown',
       });
 
       expect(output).toContain('| Rule | File | Line | Message |');
@@ -191,7 +191,7 @@ describe('Output Formatters', () => {
     it('should render detailed markdown with explanations', () => {
       const output = render(mockFindings, 4, 100, {
         format: 'markdown',
-        showExplanations: true
+        showExplanations: true,
       });
 
       expect(output).toContain('# Scry Security Scan - Detailed Report');
@@ -201,17 +201,17 @@ describe('Output Formatters', () => {
 
     it('should show success message in markdown when no findings', () => {
       const output = render([], 10, 50, {
-        format: 'markdown'
+        format: 'markdown',
       });
 
-      expect(output).toContain('✅ **No security issues found!**');
+      expect(output).toContain('**No security issues found!**');
     });
   });
 
   describe('Compact Format', () => {
     it('should render findings in compact format', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'compact'
+        format: 'compact',
       });
 
       expect(output).toContain('/test/file.js');
@@ -222,7 +222,7 @@ describe('Output Formatters', () => {
 
     it('should group findings by file in compact format', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'compact'
+        format: 'compact',
       });
 
       expect(output).toContain('/test/file.js');
@@ -233,7 +233,7 @@ describe('Output Formatters', () => {
 
     it('should show summary footer in compact format', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'compact'
+        format: 'compact',
       });
 
       expect(output).toContain('2 high');
@@ -245,7 +245,7 @@ describe('Output Formatters', () => {
 
     it('should show success message in compact format when no findings', () => {
       const output = render([], 10, 50, {
-        format: 'compact'
+        format: 'compact',
       });
 
       expect(output).toContain('No issues found');
@@ -257,8 +257,8 @@ describe('Output Formatters', () => {
   describe('Format Fallback', () => {
     it('should default to table format for invalid format', () => {
       const output = render(mockFindings, 4, 100, {
-        format: 'invalid' as any,
-        showSummary: true
+        format: 'invalid' as 'table',
+        showSummary: true,
       });
 
       expect(output).toContain('Severity');

@@ -4,6 +4,6 @@ function setSecureToken(response, res) {
   res.cookie('authToken', jwtToken, {
     httpOnly: true,
     secure: true,
-    sameSite: 'strict'
+    sameSite: 'strict',
   });
 }

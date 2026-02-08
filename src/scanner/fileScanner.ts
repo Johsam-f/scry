@@ -1,8 +1,8 @@
 import { glob } from 'glob';
-import { readFile } from 'fs/promises';
-import type { Ignore } from 'ignore';
+import { readFile, stat } from 'fs/promises';
 import ignore from 'ignore';
-import { join } from 'path';
+import { resolve } from 'path';
+import { FileError } from '../errors';
 
 export interface ScanOptions {
   path: string;
@@ -10,10 +10,52 @@ export interface ScanOptions {
   extensions?: string[];
 }
 
-// Scan directory for matching files
+// Scan directory or single file for matching files
 export async function scanFiles(options: ScanOptions): Promise<string[]> {
-  const { path, ignore: ignorePatterns = [], extensions = ['.js', '.ts', '.jsx', '.tsx'] } = options;
+  const {
+    path,
+    ignore: ignorePatterns = [],
+    extensions = ['.js', '.ts', '.jsx', '.tsx'],
+  } = options;
 
+  // Check if path is a file or directory
+  let stats;
+  try {
+    stats = await stat(path);
+  } catch (error) {
+    // Try adding extensions if file doesn't exist
+    for (const ext of extensions) {
+      try {
+        const pathWithExt = path + ext;
+        stats = await stat(pathWithExt);
+        // If we found it with an extension, scan that file
+        return [resolve(pathWithExt)];
+      } catch {
+        continue;
+      }
+    }
+    const cause = error instanceof Error ? error : new Error(String(error));
+    throw new FileError(`Path not found`, { path, triedExtensions: extensions }, cause);
+  }
+
+  // If it's a file, return just that file
+  if (stats.isFile()) {
+    const filePath = resolve(path);
+    const ext = getFileExtension(filePath);
+
+    // Check if file has a valid extension
+    if (!extensions.includes(ext)) {
+      throw new FileError(`File extension not supported`, {
+        path: filePath,
+        extension: ext,
+        supportedExtensions: extensions,
+      });
+    }
+
+    return [filePath];
+  }
+
+  // If it's a directory, scan all matching files
   const pattern = `${path}/**/*{${extensions.join(',')}}`;
 
   const files = await glob(pattern, {
@@ -24,10 +66,10 @@ export async function scanFiles(options: ScanOptions): Promise<string[]> {
       '**/.git/**',
       '**/.next/**',
       '**/coverage/**',
-      ...ignorePatterns
+      ...ignorePatterns,
     ],
     absolute: true,
-    nodir: true
+    nodir: true,
   });
 
   return files;
@@ -38,7 +80,8 @@ export async function readFileContent(filePath: string): Promise<string> {
   try {
     return await readFile(filePath, 'utf-8');
   } catch (error) {
-    throw new Error(`Failed to read file ${filePath}: ${error}`);
+    const cause = error instanceof Error ? error : new Error(String(error));
+    throw new FileError(`Failed to read file`, { filePath, error: cause.message }, cause);
   }
 }
 
@@ -55,7 +98,7 @@ export function shouldScanFile(
   ignorePatterns: string[]
 ): boolean {
   const ext = getFileExtension(filePath);
-  
+
   if (!extensions.includes(ext)) {
     return false;
   }

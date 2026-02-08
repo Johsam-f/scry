@@ -10,7 +10,7 @@ export class EnvExposureRule extends BaseRule {
   override id = 'env-exposure';
   override name = '.env File Exposure';
   override description = 'Detects potential .env file exposure risks';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'secrets', 'configuration'];
 
   private patterns = [
@@ -18,26 +18,26 @@ export class EnvExposureRule extends BaseRule {
       name: 'Static .env serving',
       pattern: /(?:express\.static|serve-static|app\.use)\s*\([^)]*['".]env/gi,
       severity: 'critical' as const,
-      message: '.env file potentially served as static content'
+      message: '.env file potentially served as static content',
     },
     {
       name: '.env in public directory reference',
       pattern: /(?:public|static|dist|build)\/\.env/gi,
       severity: 'high' as const,
-      message: '.env file referenced in public/static directory'
+      message: '.env file referenced in public/static directory',
     },
     {
       name: 'Reading .env in client code',
       pattern: /(?:fetch|axios|http\.get|XMLHttpRequest)\s*\([^)]*['"`]\.env['"`]/gi,
       severity: 'high' as const,
-      message: 'Attempting to fetch .env file from client-side code'
+      message: 'Attempting to fetch .env file from client-side code',
     },
     {
       name: '.env file path in code',
       pattern: /['"]\/?\.env(?:\.local|\.production|\.development)?['"]/gi,
       severity: 'low' as const,
-      message: '.env file path reference in code (review context)'
-    }
+      message: '.env file path reference in code (review context)',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -51,7 +51,7 @@ export class EnvExposureRule extends BaseRule {
         file: filePath,
         line: 1,
         column: 1,
-        message: 'Environment file detected - ensure it\'s in .gitignore',
+        message: "Environment file detected - ensure it's in .gitignore",
         snippet: '',
         explanation: `Environment files (.env, .env.local, .env.production) contain sensitive configuration and secrets. These files should:
 
@@ -95,7 +95,7 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
    - Platform environment variables (Vercel, Netlify, Railway)
    - Secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
    - CI/CD secret storage (GitHub Secrets, GitLab CI/CD Variables)`,
-        tags: this.tags
+        tags: this.tags,
       });
       return findings;
     }
@@ -106,27 +106,27 @@ Committing .env files is one of the most common ways secrets are leaked. Even if
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        const lineNumber = this.getLineNumber(content, match.index);
-        
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineContent = content.substring(lineStart, match.index);
-        if (lineContent.includes('//') || lineContent.includes('/*')) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
+
+        const lineNumber = this.getLineNumber(content, match.index);
 
         // For low severity patterns, check context
         if (patternConfig.severity === 'low') {
           // Skip if it's just loading dotenv
-          if (content.includes('dotenv') && content.substring(match.index - 50, match.index + 50).includes('dotenv')) {
+          if (
+            content.includes('dotenv') &&
+            content.substring(match.index - 50, match.index + 50).includes('dotenv')
+          ) {
             continue;
           }
         }
@@ -196,15 +196,15 @@ Ensure .env files are only accessed from server-side code and never exposed to c
       case 'Static .env serving':
         return `Exclude .env files from static file serving:
 
-// ❌ Insecure: May serve .env files
+// [BAD] Insecure: May serve .env files
 app.use(express.static('./'));
 app.use(express.static(__dirname));
 
-// ✅ Secure: Only serve specific public directory
+// [GOOD] Secure: Only serve specific public directory
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Secure: Explicitly exclude .env files
+// [GOOD] Secure: Explicitly exclude .env files
 const serveStatic = require('serve-static');
 app.use(serveStatic('public', {
   dotfiles: 'deny', // Deny access to dotfiles
@@ -223,9 +223,9 @@ location ~ /\\.env {
 1. Move .env to project root (not in public/static/dist):
    \`\`\`
    project/
-   ├── .env          ✅ Root level
+   ├── .env          [GOOD] Root level
    ├── .gitignore
-   ├── public/       ❌ Not here
+   ├── public/       [BAD] Not here
    └── src/
    \`\`\`
 
@@ -235,7 +235,7 @@ location ~ /\\.env {
    {
      "scripts": {
        "build": "webpack --mode production",
-       // Don't use: "cp .env dist/" ❌
+       // Don't use: "cp .env dist/" [BAD]
      }
    }
    \`\`\`
@@ -246,7 +246,7 @@ location ~ /\\.env {
    module.exports = {
      plugins: [
        new webpack.EnvironmentPlugin(['API_KEY']), // Inject specific vars
-       // Don't use CopyPlugin for .env ❌
+       // Don't use CopyPlugin for .env [BAD]
      ]
    };
    \`\`\``;
@@ -254,19 +254,19 @@ location ~ /\\.env {
       case 'Reading .env in client code':
         return `Never fetch .env from client-side code:
 
-// ❌ Insecure: Client-side fetch
+// [BAD] Insecure: Client-side fetch
 fetch('.env')
   .then(res => res.text())
   .then(data => console.log(data)); // NEVER DO THIS
 
-// ✅ Secure: Use build-time environment variables
+// [GOOD] Secure: Use build-time environment variables
 // Next.js example:
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-// ✅ Secure: Create React App example:
+// [GOOD] Secure: Create React App example:
 const apiKey = process.env.REACT_APP_API_KEY;
 
-// ✅ Secure: Vite example:
+// [GOOD] Secure: Vite example:
 const apiKey = import.meta.env.VITE_API_KEY;
 
 Note: Even with NEXT_PUBLIC_/REACT_APP_/VITE_ prefixes, these are exposed to clients.
@@ -279,14 +279,14 @@ const data = await fetch('/api/data'); // API uses secret server-side`;
       case '.env file path in code':
         return `Ensure .env is only accessed server-side:
 
-// ✅ Secure: Server-side only (Node.js)
+// [GOOD] Secure: Server-side only (Node.js)
 require('dotenv').config();
 const dbPassword = process.env.DB_PASSWORD;
 
-// ✅ Secure: Specify path if needed
+// [GOOD] Secure: Specify path if needed
 require('dotenv').config({ path: '.env.local' });
 
-// ❌ Insecure: Never expose to client
+// [BAD] Insecure: Never expose to client
 // Don't bundle .env with client-side code
 // Don't import .env in React/Vue components
 // Don't read .env from browser

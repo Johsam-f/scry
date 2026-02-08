@@ -10,7 +10,7 @@ export class WeakCryptoRule extends BaseRule {
   override id = 'weak-crypto';
   override name = 'Weak Cryptography';
   override description = 'Detects use of weak or broken cryptographic algorithms';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'cryptography', 'hashing'];
 
   private patterns = [
@@ -19,28 +19,28 @@ export class WeakCryptoRule extends BaseRule {
       pattern: /createHash\s*\(\s*['"`]md5['"`]\s*\)|\.update\(['"`]md5['"`]\)|md5\s*\(/gi,
       severity: 'high' as const,
       message: 'MD5 is cryptographically broken and should not be used',
-      algorithm: 'MD5'
+      algorithm: 'MD5',
     },
     {
       name: 'SHA1 usage',
       pattern: /createHash\s*\(\s*['"`]sha1['"`]\s*\)|sha1\s*\(/gi,
       severity: 'high' as const,
       message: 'SHA1 is cryptographically weak and should not be used',
-      algorithm: 'SHA1'
+      algorithm: 'SHA1',
     },
     {
       name: 'DES/3DES encryption',
       pattern: /createCipher(?:iv)?\s*\(\s*['"`](?:des|des-ede|des-ede3|des3)['"`]/gi,
       severity: 'high' as const,
       message: 'DES/3DES encryption is obsolete and insecure',
-      algorithm: 'DES'
+      algorithm: 'DES',
     },
     {
       name: 'ECB mode',
       pattern: /createCipher(?:iv)?\s*\(\s*['"`][^'"`]*-ecb[^'"`]*['"`]/gi,
       severity: 'high' as const,
       message: 'ECB mode is insecure (leaks patterns in encrypted data)',
-      algorithm: 'ECB'
+      algorithm: 'ECB',
     },
     {
       name: 'Weak random - Math.random()',
@@ -48,14 +48,14 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Math.random() is not cryptographically secure',
       algorithm: 'Math.random',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Unsalted hash',
       pattern: /(?:createHash|bcrypt|scrypt)\s*\([^)]*\)\.update\s*\(\s*password\s*\)\.digest/gi,
       severity: 'high' as const,
       message: 'Password hashing without salt is vulnerable to rainbow tables',
-      algorithm: 'unsalted'
+      algorithm: 'unsalted',
     },
     {
       name: 'Low bcrypt rounds',
@@ -63,7 +63,7 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Bcrypt rounds may be too low (check value)',
       algorithm: 'bcrypt',
-      checkRounds: true
+      checkRounds: true,
     },
     {
       name: 'Weak PBKDF2 iterations',
@@ -71,15 +71,15 @@ export class WeakCryptoRule extends BaseRule {
       severity: 'medium' as const,
       message: 'PBKDF2 iterations may be too low (check value)',
       algorithm: 'pbkdf2',
-      checkIterations: true
+      checkIterations: true,
     },
     {
       name: 'Hardcoded IV/Salt',
       pattern: /(?:const|let|var)\s+(?:iv|salt)\s*=\s*['"`][a-fA-F0-9]{16,}['"`]/gi,
       severity: 'high' as const,
       message: 'Hardcoded IV or salt defeats encryption security',
-      algorithm: 'hardcoded-iv'
-    }
+      algorithm: 'hardcoded-iv',
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -91,29 +91,41 @@ export class WeakCryptoRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
-        const lineNumber = this.getLineNumber(content, match.index);
-        
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const lineContent = content.substring(lineStart, match.index);
-        if (lineContent.includes('//') || lineContent.includes('/*')) {
+      for (const match of matches) {
+        // Skip if in comment using robust detection
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 
+        const lineNumber = this.getLineNumber(content, match.index);
+
         // Special handling for Math.random() - only flag in security contexts
         if (patternConfig.needsContext) {
-          const contextWindow = content.substring(Math.max(0, match.index - 100), match.index + 100).toLowerCase();
-          const securityKeywords = ['password', 'token', 'secret', 'key', 'salt', 'nonce', 'iv', 'crypto', 'session', 'auth'];
-          const hasSecurityContext = securityKeywords.some(keyword => contextWindow.includes(keyword));
-          
+          const contextWindow = content
+            .substring(Math.max(0, match.index - 100), match.index + 100)
+            .toLowerCase();
+          const securityKeywords = [
+            'password',
+            'token',
+            'secret',
+            'key',
+            'salt',
+            'nonce',
+            'iv',
+            'crypto',
+            'session',
+            'auth',
+          ];
+          const hasSecurityContext = securityKeywords.some((keyword) =>
+            contextWindow.includes(keyword)
+          );
+
           if (!hasSecurityContext) {
             continue; // Skip if not in security context
           }
@@ -253,38 +265,38 @@ IVs and salts must be randomly generated for each encryption operation.`;
       case 'MD5':
         return `Replace MD5 with secure alternatives:
 
-// ❌ Insecure: MD5
+// [BAD] Insecure: MD5
 const crypto = require('crypto');
 const hash = crypto.createHash('md5').update(password).digest('hex');
 
-// ✅ For passwords: Use bcrypt, scrypt, or Argon2
+// [GOOD] For passwords: Use bcrypt, scrypt, or Argon2
 const bcrypt = require('bcrypt');
 const hash = await bcrypt.hash(password, 12);
 
-// ✅ For general hashing: Use SHA-256 or SHA-512
+// [GOOD] For general hashing: Use SHA-256 or SHA-512
 const hash = crypto.createHash('sha256').update(data).digest('hex');
 
-// ✅ For HMACs: Use SHA-256 or SHA-512
+// [GOOD] For HMACs: Use SHA-256 or SHA-512
 const hmac = crypto.createHmac('sha256', secret).update(data).digest('hex');
 
-// ✅ For checksums only (non-security): SHA-256 is fast enough
+// [GOOD] For checksums only (non-security): SHA-256 is fast enough
 const checksum = crypto.createHash('sha256').update(file).digest('hex');`;
 
       case 'SHA1':
         return `Replace SHA1 with stronger alternatives:
 
-// ❌ Insecure: SHA1
+// [BAD] Insecure: SHA1
 const hash = crypto.createHash('sha1').update(data).digest('hex');
 
-// ✅ For general hashing: Use SHA-256 or better
+// [GOOD] For general hashing: Use SHA-256 or better
 const hash = crypto.createHash('sha256').update(data).digest('hex');
 const hash = crypto.createHash('sha512').update(data).digest('hex');
 
-// ✅ For passwords: Use bcrypt (even better)
+// [GOOD] For passwords: Use bcrypt (even better)
 const bcrypt = require('bcrypt');
 const hash = await bcrypt.hash(password, 12);
 
-// ✅ For digital signatures: Use SHA-256 or SHA-512
+// [GOOD] For digital signatures: Use SHA-256 or SHA-512
 const signature = crypto.createSign('RSA-SHA256');
 signature.update(data);
 const sig = signature.sign(privateKey, 'hex');`;
@@ -292,10 +304,10 @@ const sig = signature.sign(privateKey, 'hex');`;
       case 'DES':
         return `Replace DES/3DES with AES:
 
-// ❌ Insecure: DES or 3DES
+// [BAD] Insecure: DES or 3DES
 const cipher = crypto.createCipher('des', password);
 
-// ✅ Secure: AES-256-GCM (authenticated encryption)
+// [GOOD] Secure: AES-256-GCM (authenticated encryption)
 const crypto = require('crypto');
 const algorithm = 'aes-256-gcm';
 const key = crypto.randomBytes(32); // 256 bits
@@ -308,16 +320,16 @@ const authTag = cipher.getAuthTag();
 
 // Store: iv + encrypted + authTag
 
-// ✅ For passwords: Derive key with PBKDF2
+// [GOOD] For passwords: Derive key with PBKDF2
 const key = crypto.pbkdf2Sync(password, salt, 600000, 32, 'sha256');`;
 
       case 'ECB':
         return `Never use ECB mode - use GCM, CBC, or CTR:
 
-// ❌ Insecure: ECB mode
+// [BAD] Insecure: ECB mode
 const cipher = crypto.createCipher('aes-256-ecb', key);
 
-// ✅ Best: AES-GCM (authenticated encryption)
+// [GOOD] Best: AES-GCM (authenticated encryption)
 const algorithm = 'aes-256-gcm';
 const iv = crypto.randomBytes(16); // Must be random for each encryption
 const cipher = crypto.createCipheriv(algorithm, key, iv);
@@ -326,7 +338,7 @@ let encrypted = cipher.update(plaintext, 'utf8', 'hex');
 encrypted += cipher.final('hex');
 const authTag = cipher.getAuthTag();
 
-// ✅ Alternative: AES-CBC with HMAC
+// [GOOD] Alternative: AES-CBC with HMAC
 const algorithm = 'aes-256-cbc';
 const iv = crypto.randomBytes(16);
 const cipher = crypto.createCipheriv(algorithm, key, iv);
@@ -340,19 +352,19 @@ const hmac = crypto.createHmac('sha256', macKey).update(iv + encrypted).digest('
       case 'Math.random':
         return `Use cryptographically secure random number generators:
 
-// ❌ Insecure: Math.random() for security
+// [BAD] Insecure: Math.random() for security
 const token = Math.random().toString(36).substring(7); // NEVER
 
-// ✅ Node.js: Use crypto.randomBytes()
+// [GOOD] Node.js: Use crypto.randomBytes()
 const crypto = require('crypto');
 const token = crypto.randomBytes(32).toString('hex');
 
-// ✅ Browser: Use crypto.getRandomValues()
+// [GOOD] Browser: Use crypto.getRandomValues()
 const array = new Uint8Array(32);
 crypto.getRandomValues(array);
 const token = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
 
-// ✅ Generate random integers securely
+// [GOOD] Generate random integers securely
 function getRandomInt(min, max) {
   const range = max - min + 1;
   const bytesNeeded = Math.ceil(Math.log2(range) / 8);
@@ -366,28 +378,28 @@ function getRandomInt(min, max) {
   return min + (randomValue % range);
 }
 
-// ✅ Generate UUIDs (v4)
+// [GOOD] Generate UUIDs (v4)
 const { v4: uuidv4 } = require('uuid');
 const id = uuidv4();`;
 
       case 'unsalted':
         return `Always use salted password hashing:
 
-// ❌ Insecure: Unsalted hash
+// [BAD] Insecure: Unsalted hash
 const hash = crypto.createHash('sha256').update(password).digest('hex');
 
-// ✅ Best: Use bcrypt (salting automatic)
+// [GOOD] Best: Use bcrypt (salting automatic)
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const hash = await bcrypt.hash(password, saltRounds);
 const isValid = await bcrypt.compare(password, hash);
 
-// ✅ Alternative: scrypt (salting automatic)
+// [GOOD] Alternative: scrypt (salting automatic)
 const salt = crypto.randomBytes(16);
 const hash = crypto.scryptSync(password, salt, 64);
 // Store: salt + hash
 
-// ✅ Alternative: PBKDF2 with salt
+// [GOOD] Alternative: PBKDF2 with salt
 const salt = crypto.randomBytes(16);
 const iterations = 600000;
 const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha256');
@@ -396,13 +408,13 @@ const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha256');
       case 'bcrypt':
         return `Increase bcrypt rounds to at least 12:
 
-// ❌ Weak: Low rounds
+// [BAD] Weak: Low rounds
 const hash = await bcrypt.hash(password, 8); // Too fast
 
-// ✅ Secure: Adequate rounds
+// [GOOD] Secure: Adequate rounds
 const hash = await bcrypt.hash(password, 12); // Recommended minimum (2024)
 
-// ✅ Best: Adaptive rounds
+// [GOOD] Best: Adaptive rounds
 const saltRounds = 14; // Slower but more secure
 const hash = await bcrypt.hash(password, saltRounds);
 
@@ -423,14 +435,14 @@ const testRounds = async () => {
       case 'pbkdf2':
         return `Increase PBKDF2 iterations to at least 600,000:
 
-// ❌ Weak: Low iterations
+// [BAD] Weak: Low iterations
 const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha256'); // Too fast
 
-// ✅ Secure: OWASP recommended (2023)
+// [GOOD] Secure: OWASP recommended (2023)
 const iterations = 600000; // For PBKDF2-HMAC-SHA256
 const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha256');
 
-// ✅ With SHA-512: Can use lower iterations
+// [GOOD] With SHA-512: Can use lower iterations
 const iterations = 210000; // For PBKDF2-HMAC-SHA512
 const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha512');
 
@@ -458,7 +470,7 @@ function verifyPassword(password, stored) {
   return hash.toString('hex') === stored.hash;
 }
 
-// ✅ Better alternative: Use Argon2 (more GPU-resistant)
+// [GOOD] Better alternative: Use Argon2 (more GPU-resistant)
 const argon2 = require('argon2');
 const hash = await argon2.hash(password);
 const isValid = await argon2.verify(hash, password);`;
@@ -466,11 +478,11 @@ const isValid = await argon2.verify(hash, password);`;
       case 'hardcoded-iv':
         return `Generate random IVs/salts for each operation:
 
-// ❌ Insecure: Hardcoded IV
+// [BAD] Insecure: Hardcoded IV
 const iv = Buffer.from('1234567890abcdef');
 const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
-// ✅ Secure: Random IV for each encryption
+// [GOOD] Secure: Random IV for each encryption
 const crypto = require('crypto');
 const algorithm = 'aes-256-gcm';
 
@@ -501,7 +513,7 @@ function decrypt(encryptedData, key) {
   return decrypted;
 }
 
-// ✅ For salts: Random per password
+// [GOOD] For salts: Random per password
 function hashPassword(password) {
   const salt = crypto.randomBytes(16); // NEW random salt per user
   const hash = crypto.scryptSync(password, salt, 64);

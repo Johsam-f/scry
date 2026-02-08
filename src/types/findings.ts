@@ -18,6 +18,8 @@ export interface Finding {
 export interface ScanResult {
   findings: Finding[];
   filesScanned: number;
+  filesSkipped: number;
+  skippedFiles: Array<{ file: string; reason: string }>;
   duration: number;
   timestamp: Date;
 }

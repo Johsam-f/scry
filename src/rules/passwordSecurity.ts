@@ -5,59 +5,62 @@ export class PasswordSecurityRule extends BaseRule {
   override id = 'password-security';
   override name = 'Password Security';
   override description = 'Detects insecure password handling and validation practices';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'passwords', 'authentication'];
 
   private patterns = [
     {
       name: 'Plaintext password storage',
-      pattern: /(?:password|passwd|pwd)\s*[=:]\s*['"`][^'"`]+['"`]|\.password\s*=|database\.insert\s*\([^)]*password[^)]*\)/gi,
+      pattern:
+        /(?:password|passwd|pwd)\s*[=:]\s*['"`][^'"`]+['"`]|\.password\s*=|database\.insert\s*\([^)]*password[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password appears to be stored or transmitted in plaintext',
       category: 'storage',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Password in URL',
       pattern: /(?:https?|ftp):\/\/[^:]+:([^@\s]+)@/gi,
       severity: 'high' as const,
       message: 'Password in URL (credentials should not be in URLs)',
-      category: 'url'
+      category: 'url',
     },
     {
       name: 'Password logging',
-      pattern: /(?:console\.log|logger\.(?:info|debug|warn|error))\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
+      pattern:
+        /(?:console\.log|logger\.(?:info|debug|warn|error))\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password may be logged (never log passwords)',
-      category: 'logging'
+      category: 'logging',
     },
     {
       name: 'Weak password validation',
       pattern: /password\.length\s*[<>=!]+\s*[1-7]\b/gi,
       severity: 'medium' as const,
       message: 'Password length requirement is too short (minimum 8 characters)',
-      category: 'validation'
+      category: 'validation',
     },
     {
       name: 'No password validation',
-      pattern: /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=\(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
+      pattern:
+        /(?:function|const|let|var)\s+(?:validate|check|verify)Password\s*[=(][^{]*\{\s*return\s+true\s*;?\s*\}/gi,
       severity: 'high' as const,
       message: 'Password validation function always returns true',
-      category: 'validation'
+      category: 'validation',
     },
     {
       name: 'Password in GET request',
       pattern: /(?:axios|fetch|request)\.get\s*\([^)]*[?&](?:password|passwd|pwd)=/gi,
       severity: 'high' as const,
       message: 'Password sent via GET request (use POST with body)',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password in query string',
       pattern: /(?:query|params|searchParams)\s*=\s*[^;]*[?&](?:password|passwd|pwd)=/gi,
       severity: 'high' as const,
       message: 'Password in query string (passwords should be in request body)',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password comparison without timing safety',
@@ -65,7 +68,7 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'medium' as const,
       message: 'Direct password comparison (vulnerable to timing attacks)',
       category: 'comparison',
-      needsContext: true
+      needsContext: true,
     },
     {
       name: 'Missing password complexity',
@@ -73,42 +76,44 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'low' as const,
       message: 'Check if password regex enforces sufficient complexity',
       category: 'validation',
-      isLowRisk: true
+      isLowRisk: true,
     },
     {
       name: 'Password in localStorage',
       pattern: /localStorage\.(?:setItem|set)\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password stored in localStorage (never store passwords in browser storage)',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Password in sessionStorage',
       pattern: /sessionStorage\.(?:setItem|set)\s*\([^)]*(?:password|passwd|pwd)[^)]*\)/gi,
       severity: 'high' as const,
       message: 'Password stored in sessionStorage (never store passwords in browser storage)',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Password in cookies without secure flags',
-      pattern: /(?:document\.cookie|res\.cookie)\s*[=\(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
+      pattern:
+        /(?:document\.cookie|res\.cookie)\s*[=(][^;)]*(?:password|passwd|pwd)[^;)]*(?!.*httpOnly)(?!.*secure)/gi,
       severity: 'high' as const,
       message: 'Password in cookie without secure/httpOnly flags',
-      category: 'storage'
+      category: 'storage',
     },
     {
       name: 'Hardcoded default password',
-      pattern: /(?:default|initial|temp|temporary)(?:Password|Passwd|Pwd)\s*[=:]\s*['"`][^'"`]+['"`]/gi,
+      pattern:
+        /(?:default|initial|temp|temporary)(?:Password|Passwd|Pwd)\s*[=:]\s*['"`][^'"`]+['"`]/gi,
       severity: 'high' as const,
       message: 'Hardcoded default password (security risk)',
-      category: 'hardcoded'
+      category: 'hardcoded',
     },
     {
       name: 'Password sent over HTTP',
-      pattern: /http:\/\/[^\/]+\/[^\s]*(?:login|auth|signin|password)/gi,
+      pattern: /http:\/\/[^/]+\/[^\s]*(?:login|auth|signin|password)/gi,
       severity: 'high' as const,
       message: 'Authentication endpoint uses HTTP instead of HTTPS',
-      category: 'transmission'
+      category: 'transmission',
     },
     {
       name: 'Password autocomplete enabled',
@@ -116,8 +121,8 @@ export class PasswordSecurityRule extends BaseRule {
       severity: 'low' as const,
       message: 'Password field has autocomplete enabled explicitly',
       category: 'ui',
-      isLowRisk: true
-    }
+      isLowRisk: true,
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -129,21 +134,17 @@ export class PasswordSecurityRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
+      for (const match of matches) {
         const lineNumber = this.getLineNumber(content, match.index);
-        
-        // Skip if in comment
-        const lineStart = content.lastIndexOf('\n', match.index) + 1;
-        const beforeMatch = content.substring(lineStart, match.index);
-        
-        if (this.isInComment(beforeMatch, content, match.index)) {
+
+        // Skip if in comment using robust detection from base class
+        if (this.isInComment(content, match.index)) {
           continue;
         }
 
@@ -156,13 +157,26 @@ export class PasswordSecurityRule extends BaseRule {
         if (patternConfig.needsContext && patternConfig.category === 'storage') {
           // Check if password is being hashed
           const contextBefore = content.substring(Math.max(0, match.index - 200), match.index);
-          const contextAfter = content.substring(match.index, Math.min(content.length, match.index + 200));
+          const contextAfter = content.substring(
+            match.index,
+            Math.min(content.length, match.index + 200)
+          );
           const fullContext = contextBefore + contextAfter;
-          
+
           // Skip if hashing/encryption is present
-          const secureKeywords = ['hash', 'bcrypt', 'scrypt', 'argon2', 'encrypt', 'crypto', 'pbkdf2'];
-          const hasSecureHandling = secureKeywords.some(keyword => fullContext.toLowerCase().includes(keyword));
-          
+          const secureKeywords = [
+            'hash',
+            'bcrypt',
+            'scrypt',
+            'argon2',
+            'encrypt',
+            'crypto',
+            'pbkdf2',
+          ];
+          const hasSecureHandling = secureKeywords.some((keyword) =>
+            fullContext.toLowerCase().includes(keyword)
+          );
+
           if (hasSecureHandling) {
             continue;
           }
@@ -170,12 +184,22 @@ export class PasswordSecurityRule extends BaseRule {
 
         // Context-aware checking for password comparison
         if (patternConfig.needsContext && patternConfig.category === 'comparison') {
-          const contextWindow = content.substring(Math.max(0, match.index - 100), Math.min(content.length, match.index + 100));
-          
+          const contextWindow = content.substring(
+            Math.max(0, match.index - 100),
+            Math.min(content.length, match.index + 100)
+          );
+
           // Skip if using secure comparison methods
-          const secureComparison = ['bcrypt.compare', 'crypto.timingSafeEqual', 'verify', 'compareSync'];
-          const hasSecureComparison = secureComparison.some(method => contextWindow.includes(method));
-          
+          const secureComparison = [
+            'bcrypt.compare',
+            'crypto.timingSafeEqual',
+            'verify',
+            'compareSync',
+          ];
+          const hasSecureComparison = secureComparison.some((method) =>
+            contextWindow.includes(method)
+          );
+
           if (hasSecureComparison) {
             continue;
           }
@@ -200,19 +224,6 @@ export class PasswordSecurityRule extends BaseRule {
     }
 
     return findings;
-  }
-
-  private isInComment(beforeMatch: string, content: string, index: number): boolean {
-    // Check for single-line comment
-    if (beforeMatch.includes('//')) {
-      return true;
-    }
-
-    // Check for multi-line comment
-    const lastCommentStart = content.lastIndexOf('/*', index);
-    const lastCommentEnd = content.lastIndexOf('*/', index);
-    
-    return lastCommentStart > lastCommentEnd;
   }
 
   private getExplanation(category: string): string {
@@ -315,14 +326,14 @@ For sensitive applications, consider disabling autocomplete. For normal applicat
       case 'storage':
         return `Never store passwords in plaintext - always hash them:
 
-// ❌ NEVER: Plaintext password storage
+// [BAD] NEVER: Plaintext password storage
 const user = {
   username: 'alice',
   password: 'secret123' // NEVER DO THIS
 };
 await db.users.insert(user);
 
-// ✅ CORRECT: Hash passwords before storage
+// [GOOD] CORRECT: Hash passwords before storage
 const bcrypt = require('bcrypt');
 
 // When creating/updating password:
@@ -343,13 +354,13 @@ if (isValid) {
   // Password is correct
 }
 
-// ✅ Alternative: Argon2 (even better)
+// [GOOD] Alternative: Argon2 (even better)
 const argon2 = require('argon2');
 
 const hash = await argon2.hash(plainPassword);
 const isValid = await argon2.verify(hash, plainPassword);
 
-// ✅ Alternative: scrypt (built into Node.js crypto)
+// [GOOD] Alternative: scrypt (built into Node.js crypto)
 const crypto = require('crypto');
 
 const salt = crypto.randomBytes(16);
@@ -365,15 +376,15 @@ await db.users.insert({
       case 'logging':
         return `Never log passwords - redact or omit them:
 
-// ❌ NEVER: Logging passwords
+// [BAD] NEVER: Logging passwords
 console.log('User login:', username, password);
 logger.info({ username, password });
 
-// ✅ CORRECT: Omit password from logs
+// [GOOD] CORRECT: Omit password from logs
 console.log('User login:', username);
 logger.info({ username, action: 'login' });
 
-// ✅ CORRECT: Redact sensitive fields
+// [GOOD] CORRECT: Redact sensitive fields
 function sanitizeForLogging(obj) {
   const sanitized = { ...obj };
   const sensitiveFields = ['password', 'passwd', 'pwd', 'token', 'secret'];
@@ -389,7 +400,7 @@ function sanitizeForLogging(obj) {
 
 logger.info(sanitizeForLogging(req.body));
 
-// ✅ CORRECT: Use structured logging with field filtering
+// [GOOD] CORRECT: Use structured logging with field filtering
 const winston = require('winston');
 
 const logger = winston.createLogger({
@@ -404,24 +415,24 @@ const logger = winston.createLogger({
   )
 });
 
-// ✅ For debugging: Log that password was received
+// [GOOD] For debugging: Log that password was received
 console.log('Password received:', password ? 'yes' : 'no');
 console.log('Password length:', password?.length);`;
 
       case 'transmission':
         return `Always send passwords via POST with HTTPS, never in URLs or GET requests:
 
-// ❌ NEVER: Password in GET request
+// [BAD] NEVER: Password in GET request
 fetch(\`https://api.example.com/login?username=\${user}&password=\${pass}\`);
 
 axios.get('/login', {
   params: { username: user, password: pass }
 });
 
-// ❌ NEVER: Password in URL
+// [BAD] NEVER: Password in URL
 window.location.href = \`/login?password=\${pass}\`;
 
-// ✅ CORRECT: POST request with body
+// [GOOD] CORRECT: POST request with body
 fetch('https://api.example.com/login', {
   method: 'POST',
   headers: {
@@ -433,13 +444,13 @@ fetch('https://api.example.com/login', {
   })
 });
 
-// ✅ CORRECT: Axios POST
+// [GOOD] CORRECT: Axios POST
 axios.post('/login', {
   username: user,
   password: pass
 });
 
-// ✅ CORRECT: Fetch with FormData
+// [GOOD] CORRECT: Fetch with FormData
 const formData = new FormData();
 formData.append('username', user);
 formData.append('password', pass);
@@ -449,7 +460,7 @@ fetch('https://api.example.com/login', {
   body: formData
 });
 
-// ✅ Server side: Ensure HTTPS is enforced
+// [GOOD] Server side: Ensure HTTPS is enforced
 app.use((req, res, next) => {
   if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
     return res.redirect('https://' + req.get('host') + req.url);
@@ -460,11 +471,11 @@ app.use((req, res, next) => {
       case 'url':
         return `Never put credentials in URLs - use proper authentication:
 
-// ❌ NEVER: Credentials in URL
+// [BAD] NEVER: Credentials in URL
 const url = 'https://user:password@api.example.com/data';
 fetch(url);
 
-// ✅ CORRECT: Use Authorization header
+// [GOOD] CORRECT: Use Authorization header
 const auth = 'Basic ' + btoa(username + ':' + password);
 fetch('https://api.example.com/data', {
   headers: {
@@ -472,7 +483,7 @@ fetch('https://api.example.com/data', {
   }
 });
 
-// ✅ BETTER: Use token-based authentication
+// [GOOD] BETTER: Use token-based authentication
 // 1. Login to get token
 const loginResponse = await fetch('https://api.example.com/login', {
   method: 'POST',
@@ -488,13 +499,13 @@ fetch('https://api.example.com/data', {
   }
 });
 
-// ✅ BEST: OAuth 2.0 or OpenID Connect
+// [GOOD] BEST: OAuth 2.0 or OpenID Connect
 // Use established authentication libraries:
 // - passport.js (Node.js)
 // - NextAuth (Next.js)
 // - Auth0, Firebase Auth, AWS Cognito (managed services)
 
-// ✅ For database connections: Use connection objects
+// [GOOD] For database connections: Use connection objects
 const mysql = require('mysql2');
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -506,17 +517,17 @@ const connection = mysql.createConnection({
       case 'validation':
         return `Enforce strong password requirements:
 
-// ❌ WEAK: Password too short
+// [BAD] WEAK: Password too short
 function validatePassword(password) {
   return password.length >= 6;  // Too short!
 }
 
-// ❌ WEAK: No validation at all
+// [BAD] WEAK: No validation at all
 function validatePassword(password) {
   return true;  // Accepts anything!
 }
 
-// ✅ GOOD: Minimum 8 characters
+// [GOOD] GOOD: Minimum 8 characters
 function validatePassword(password) {
   if (password.length < 8) {
     return { valid: false, reason: 'Password must be at least 8 characters' };
@@ -524,7 +535,7 @@ function validatePassword(password) {
   return { valid: true };
 }
 
-// ✅ BETTER: Length + complexity requirements
+// [GOOD] BETTER: Length + complexity requirements
 function validatePassword(password) {
   const minLength = 12;
   const hasUpperCase = /[A-Z]/.test(password);
@@ -556,7 +567,7 @@ function validatePassword(password) {
   };
 }
 
-// ✅ BEST: Check against common passwords
+// [GOOD] BEST: Check against common passwords
 const commonPasswords = require('common-passwords'); // Use a library
 
 function validatePassword(password) {
@@ -586,7 +597,7 @@ function validatePassword(password) {
   return { valid: true };
 }
 
-// ✅ Consider using a library like zxcvbn for password strength estimation
+// [GOOD] Consider using a library like zxcvbn for password strength estimation
 const zxcvbn = require('zxcvbn');
 
 function validatePassword(password) {
@@ -606,19 +617,19 @@ function validatePassword(password) {
       case 'comparison':
         return `Use timing-safe password comparison methods:
 
-// ❌ VULNERABLE: Direct string comparison (timing attack)
+// [BAD] VULNERABLE: Direct string comparison (timing attack)
 if (password === storedPassword) {
   // Comparison time varies based on where strings differ
   login();
 }
 
-// ❌ VULNERABLE: Direct comparison of hashes
+// [BAD] VULNERABLE: Direct comparison of hashes
 if (hash(password) === storedHash) {
   // Still vulnerable to timing attacks
   login();
 }
 
-// ✅ CORRECT: Use bcrypt's built-in comparison
+// [GOOD] CORRECT: Use bcrypt's built-in comparison
 const bcrypt = require('bcrypt');
 
 const isValid = await bcrypt.compare(password, storedPasswordHash);
@@ -628,7 +639,7 @@ if (isValid) {
   login();
 }
 
-// ✅ CORRECT: Use crypto.timingSafeEqual for custom comparisons
+// [GOOD] CORRECT: Use crypto.timingSafeEqual for custom comparisons
 const crypto = require('crypto');
 
 function timingSafeCompare(a, b) {
@@ -656,7 +667,7 @@ if (timingSafeCompare(userInputHash, storedHash)) {
   login();
 }
 
-// ✅ BEST: Use password hashing library (handles timing safety)
+// [GOOD] BEST: Use password hashing library (handles timing safety)
 const argon2 = require('argon2');
 
 const isValid = await argon2.verify(storedHash, password);
@@ -678,18 +689,18 @@ try {
       case 'hardcoded':
         return `Never hardcode passwords - use environment variables or secure vaults:
 
-// ❌ NEVER: Hardcoded passwords
+// [BAD] NEVER: Hardcoded passwords
 const defaultPassword = 'admin123';
 const DB_PASSWORD = 'mySecretPassword';
 
-// ✅ CORRECT: Use environment variables
+// [GOOD] CORRECT: Use environment variables
 const defaultPassword = process.env.DEFAULT_PASSWORD;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 // Load from .env file (never commit .env to git!)
 require('dotenv').config();
 
-// ✅ CORRECT: Generate random password on first run
+// [GOOD] CORRECT: Generate random password on first run
 const crypto = require('crypto');
 
 function generateSecurePassword(length = 16) {
@@ -704,7 +715,7 @@ if (!process.env.ADMIN_PASSWORD) {
   process.exit(1);
 }
 
-// ✅ BETTER: Use secret management services
+// [GOOD] BETTER: Use secret management services
 // AWS Secrets Manager
 const AWS = require('aws-sdk');
 const secretsManager = new AWS.SecretsManager();
@@ -740,7 +751,7 @@ async function getPassword() {
   return result.data.data.password;
 }
 
-// ✅ For development: Use .env with .env.example template
+// [GOOD] For development: Use .env with .env.example template
 // .env.example (commit this):
 DB_HOST=localhost
 DB_USER=myuser
@@ -754,31 +765,31 @@ DB_PASSWORD=actual-secure-password-here`;
       case 'ui':
         return `Control password field autocomplete appropriately:
 
-<!-- ❌ Explicitly enabling autocomplete (usually unnecessary) -->
+<!-- [BAD] Explicitly enabling autocomplete (usually unnecessary) -->
 <input type="password" autocomplete="on" />
 
-<!-- ✅ For sensitive apps: Disable autocomplete -->
+<!-- [GOOD] For sensitive apps: Disable autocomplete -->
 <input 
   type="password" 
   autocomplete="off"
   name="password"
 />
 
-<!-- ✅ For new passwords: Use autocomplete="new-password" -->
+<!-- [GOOD] For new passwords: Use autocomplete="new-password" -->
 <input 
   type="password" 
   autocomplete="new-password"
   name="new-password"
 />
 
-<!-- ✅ For current passwords: Use autocomplete="current-password" -->
+<!-- [GOOD] For current passwords: Use autocomplete="current-password" -->
 <input 
   type="password" 
   autocomplete="current-password"
   name="current-password"
 />
 
-<!-- ✅ Full login form with proper autocomplete -->
+<!-- [GOOD] Full login form with proper autocomplete -->
 <form method="POST" action="/login">
   <input 
     type="text" 
@@ -793,7 +804,7 @@ DB_PASSWORD=actual-secure-password-here`;
   <button type="submit">Login</button>
 </form>
 
-<!-- ✅ Password change form -->
+<!-- [GOOD] Password change form -->
 <form method="POST" action="/change-password">
   <input 
     type="password" 
@@ -813,7 +824,7 @@ DB_PASSWORD=actual-secure-password-here`;
   <button type="submit">Change Password</button>
 </form>
 
-/* ✅ React example */
+/* [GOOD] React example */
 function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>

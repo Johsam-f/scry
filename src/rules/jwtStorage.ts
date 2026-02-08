@@ -8,30 +8,26 @@ export class JWTStorageRule extends BaseRule {
   override id = 'jwt-storage';
   override name = 'JWT in Client Storage';
   override description = 'Detects JWT tokens stored in localStorage or sessionStorage';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'auth', 'storage'];
 
   private patterns = [
     {
       name: 'localStorage',
-      pattern:
-        /localStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi
+      pattern: /localStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi,
     },
     {
       name: 'sessionStorage',
-      pattern:
-        /sessionStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi
+      pattern: /sessionStorage\s*\.\s*setItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"]([^)]*)\)/gi,
     },
     {
       name: 'localStorage.getItem',
-      pattern:
-        /localStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi
+      pattern: /localStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi,
     },
     {
       name: 'sessionStorage.getItem',
-      pattern:
-        /sessionStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi
-    }
+      pattern: /sessionStorage\s*\.\s*getItem\s*\(\s*['"](\w*token\w*|jwt|auth)['"][^)]*\)/gi,
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -43,15 +39,18 @@ export class JWTStorageRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      // Reset regex if global flag
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
+      for (const match of matches) {
+        // Skip if in comment
+        if (this.isInComment(content, match.index)) {
+          continue;
+        }
+
         const lineNumber = this.getLineNumber(content, match.index);
 
         findings.push(

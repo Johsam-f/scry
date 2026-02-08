@@ -16,23 +16,24 @@ export class CookieSecurityRule extends BaseRule {
   override id = 'cookie-security';
   override name = 'Insecure Cookie Configuration';
   override description = 'Detects cookies set without HttpOnly and Secure flags';
-  override severity: 'high' = 'high';
+  override severity = 'high' as const;
   override tags = ['security', 'cookies', 'auth'];
 
   private patterns = [
     {
       // Express res.cookie() without httpOnly or secure
       name: 'Express cookie',
-      pattern: /res\.cookie\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*([^,)]+)(?:\s*,\s*\{([^}]*)\})?\s*\)/gi,
+      pattern:
+        /res\.cookie\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*([^,)]+)(?:\s*,\s*\{([^}]*)\})?\s*\)/gi,
       checkFlags: (match: RegExpExecArray): CookieFlags => {
         const options = match[3] || '';
         return {
           hasHttpOnly: /httpOnly\s*:\s*true/i.test(options),
           hasSecure: /secure\s*:\s*true/i.test(options),
           hasSameSite: /sameSite\s*:\s*['"`]?(strict|lax)['"`]?/i.test(options),
-          cookieName: match[1] || 'unknown'
+          cookieName: match[1] || 'unknown',
         };
-      }
+      },
     },
     {
       // Set-Cookie header (string)
@@ -44,9 +45,9 @@ export class CookieSecurityRule extends BaseRule {
           hasHttpOnly: /;\s*HttpOnly/i.test(cookieValue),
           hasSecure: /;\s*Secure/i.test(cookieValue),
           hasSameSite: /;\s*SameSite=(Strict|Lax)/i.test(cookieValue),
-          cookieName: (cookieValue.split('=')[0]) || 'unknown'
+          cookieName: cookieValue.split('=')[0] || 'unknown',
         };
-      }
+      },
     },
     {
       // document.cookie (client-side)
@@ -58,25 +59,26 @@ export class CookieSecurityRule extends BaseRule {
           hasHttpOnly: false, // document.cookie can never set httpOnly
           hasSecure: /;\s*secure/i.test(cookieValue),
           hasSameSite: /;\s*SameSite=(Strict|Lax|None)/i.test(cookieValue),
-          cookieName: (cookieValue.split('=')[0]) || 'unknown',
-          isClientSide: true
+          cookieName: cookieValue.split('=')[0] || 'unknown',
+          isClientSide: true,
         };
-      }
+      },
     },
     {
       // Koa ctx.cookies.set
       name: 'Koa cookie',
-      pattern: /ctx\.cookies\.set\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*([^,)]+)(?:\s*,\s*\{([^}]*)\})?\s*\)/gi,
+      pattern:
+        /ctx\.cookies\.set\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*([^,)]+)(?:\s*,\s*\{([^}]*)\})?\s*\)/gi,
       checkFlags: (match: RegExpExecArray): CookieFlags => {
         const options = match[3] || '';
         return {
           hasHttpOnly: /httpOnly\s*:\s*true/i.test(options),
           hasSecure: /secure\s*:\s*true/i.test(options),
           hasSameSite: /sameSite\s*:\s*['"`]?(strict|lax)['"`]?/i.test(options),
-          cookieName: match[1] || 'unknown'
+          cookieName: match[1] || 'unknown',
         };
-      }
-    }
+      },
+    },
   ];
 
   override async check(content: string, filePath: string): Promise<Finding[]> {
@@ -88,15 +90,18 @@ export class CookieSecurityRule extends BaseRule {
     }
 
     for (const patternConfig of this.patterns) {
-      let match;
-      const pattern = patternConfig.pattern;
+      // Create a fresh regex instance to avoid state issues
+      const pattern = this.createRegex(patternConfig.pattern);
 
-      // Reset regex if global flag
-      if (pattern.global) {
-        pattern.lastIndex = 0;
-      }
+      // Use timeout-protected execution for safety
+      const matches = this.execWithTimeout(pattern, content);
 
-      while ((match = pattern.exec(content)) !== null) {
+      for (const match of matches) {
+        // Skip if in comment
+        if (this.isInComment(content, match.index)) {
+          continue;
+        }
+
         const flags = patternConfig.checkFlags(match);
         const lineNumber = this.getLineNumber(content, match.index);
         const missingFlags: string[] = [];
@@ -110,8 +115,6 @@ export class CookieSecurityRule extends BaseRule {
 
         // Only report if flags are missing
         if (missingFlags.length > 0) {
-          const severity = this.getSeverity(flags);
-          
           findings.push(
             this.createFinding(
               `Cookie '${flags.cookieName}' missing ${missingFlags.join(' and ')} flag${missingFlags.length > 1 ? 's' : ''}`,
@@ -144,17 +147,23 @@ export class CookieSecurityRule extends BaseRule {
 
   private getExplanation(flags: CookieFlags, isClientSide: boolean = false): string {
     const missing: string[] = [];
-    
+
     if (!flags.hasHttpOnly && !isClientSide) {
-      missing.push(`**HttpOnly**: Without this flag, JavaScript can access the cookie via document.cookie, making it vulnerable to XSS attacks where attackers steal session tokens.`);
+      missing.push(
+        `**HttpOnly**: Without this flag, JavaScript can access the cookie via document.cookie, making it vulnerable to XSS attacks where attackers steal session tokens.`
+      );
     }
-    
+
     if (!flags.hasSecure) {
-      missing.push(`**Secure**: Without this flag, the cookie can be transmitted over unencrypted HTTP connections, allowing attackers to intercept it via man-in-the-middle attacks.`);
+      missing.push(
+        `**Secure**: Without this flag, the cookie can be transmitted over unencrypted HTTP connections, allowing attackers to intercept it via man-in-the-middle attacks.`
+      );
     }
 
     if (isClientSide) {
-      missing.push(`**Client-side cookie**: Setting cookies via document.cookie is inherently insecure as it cannot use HttpOnly protection. Use server-side cookie setting instead.`);
+      missing.push(
+        `**Client-side cookie**: Setting cookies via document.cookie is inherently insecure as it cannot use HttpOnly protection. Use server-side cookie setting instead.`
+      );
     }
 
     return `${missing.join('\n\n')}\n\nBoth flags are essential for protecting sensitive data like session tokens and authentication credentials.`;
@@ -164,7 +173,7 @@ export class CookieSecurityRule extends BaseRule {
     if (patternName === 'Express cookie' || patternName === 'Koa cookie') {
       return `Set cookies with proper security flags:
 
-// ✅ Secure configuration
+// [GOOD] Secure configuration
 res.cookie('${flags.cookieName}', value, {
   httpOnly: true,    // Prevent JavaScript access (XSS protection)
   secure: true,      // HTTPS only (MITM protection)
@@ -183,7 +192,7 @@ res.cookie('${flags.cookieName}', value, {
     if (patternName === 'Set-Cookie header') {
       return `Set the Set-Cookie header with proper flags:
 
-// ✅ Secure configuration
+// [GOOD] Secure configuration
 res.setHeader('Set-Cookie', 
   '${flags.cookieName}=value; HttpOnly; Secure; SameSite=Strict; Max-Age=3600'
 );
@@ -192,12 +201,12 @@ res.setHeader('Set-Cookie',
     }
 
     if (patternName === 'document.cookie') {
-      return `⚠️ Avoid setting cookies client-side. Use server-side cookie setting instead:
+      return `[WARNING] Avoid setting cookies client-side. Use server-side cookie setting instead:
 
-// ❌ Insecure (client-side)
+// [BAD] Insecure (client-side)
 document.cookie = '${flags.cookieName}=value';
 
-// ✅ Secure (server-side - Express example)
+// [GOOD] Secure (server-side - Express example)
 // In your API endpoint:
 res.cookie('${flags.cookieName}', value, {
   httpOnly: true,
