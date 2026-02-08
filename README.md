@@ -8,17 +8,25 @@
 
 **scry** is a command-line security scanner that detects common but dangerous security mistakes in JavaScript/TypeScript projects and provides:
 
-[+] **Clear explanations** of why each issue is risky  
-[+] **Actionable fixes** with code examples  
-[+] **Educational context** to build security awareness  
-[+] **Fast, focused scanning** without overwhelming noise
+- **Clear explanations** of why each issue is risky  
+- **Actionable fixes** with code examples  
+- **Educational context** to build security awareness  
+- **Fast, focused scanning** without overwhelming noise
 
 ## Quick Start
 
-```bash
-# Install (coming soon to npm)
-bun install scry
+Clone and run from source:
 
+```bash
+git clone https://github.com/johsam/scry.git
+cd scry
+bun install
+bun run dev scan .
+```
+
+Or after building:
+
+```bash
 # Scan current directory
 scry scan .
 
@@ -31,6 +39,8 @@ scry scan . --strict
 # Output as JSON
 scry scan . --output json
 ```
+
+Note: npm package coming soon.
 
 ## What scry Detects
 
@@ -47,24 +57,24 @@ scry scan . --output json
 
 ## Example Output
 
+Table format (default):
+
 ```
-┌──────────┬────────────────────┬─────────────────┬──────┬──────────────────────┐
-│ Severity │ Rule               │ File            │ Line │ Message              │
-├──────────┼────────────────────┼─────────────────┼──────┼──────────────────────┤
-│ [HIGH]   │ hardcoded-secrets  │ src/config.ts   │ 14   │ Hardcoded API key    │
-│ [HIGH]   │ jwt-storage        │ src/auth.ts     │ 28   │ JWT in localStorage  │
-│ [MEDIUM] │ cors-config        │ src/server.ts   │ 45   │ Permissive CORS      │
-└──────────┴────────────────────┴─────────────────┴──────┴──────────────────────┘
+Severity | Rule               | File          | Line | Message
+---------|--------------------| --------------|------|---------------------
+HIGH     | hardcoded-secrets  | src/config.ts | 14   | Hardcoded API key
+HIGH     | jwt-storage        | src/auth.ts   | 28   | JWT in localStorage
+MEDIUM   | cors-config        | src/server.ts | 45   | Permissive CORS
 
 Summary:
 Files scanned: 847
 Duration: 2.3s
 
 Results:
-[HIGH] Count: 3
-[MEDIUM] Count: 6
-[LOW] Count: 3
-Total: 12
+HIGH:    3
+MEDIUM:  6
+LOW:     3
+Total:   12
 ```
 
 ## Installation
@@ -91,9 +101,6 @@ scry scan
 
 # Specific path
 scry scan ./src
-
-# Multiple paths
-scry scan ./src ./tests
 ```
 
 ### Output Formats
@@ -111,6 +118,8 @@ scry scan . --output json > results.json
 # Markdown - For reports and documentation
 scry scan . --output markdown > SECURITY.md
 ```
+
+Supported formats: `table` (default), `compact`, `json`, `markdown`
 
 **See [Output Formats Guide](./docs/output-formats.md) for detailed examples and use cases.**
 
@@ -213,15 +222,16 @@ This project was created for the [GitHub Copilot CLI Challenge](https://dev.to/c
 - Multiple output formatters for different workflows
 - Full configuration file support for flexible deployments
 
-See [Copilot Impact Documentation](docs/COPILOT_IMPACT.md) for detailed information on how Copilot CLI enhanced the development process, with session logs, time savings analysis, and specific examples of AI-assisted development.
+For detailed information on how Copilot CLI enhanced the development process, see [Copilot Impact Documentation](docs/copilot%20workings).
 
-- **Bun** - Fast runtime
+## Technology Stack
+
+- **Bun** - Fast JavaScript runtime
+- **TypeScript** - Type-safe development
 - **Commander.js** - CLI framework
 - **Chalk** - Terminal colors
-- **Glob** - File matching
+- **Glob** - File pattern matching
 
----
+## Support
 
-**Built for the GitHub Copilot CLI Challenge**
-
-Demonstrate how GitHub Copilot CLI enhanced the development process - See [docs/copilot workings](docs/copilot%20workings)
+For questions or issues, please check the [documentation](docs/) or create an issue on GitHub.
