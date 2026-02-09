@@ -263,6 +263,8 @@ export class ConfigLoader {
     }
 
     if (cliOptions.fix === true) {
+
+    if (cliOptions.fix === true) {
       merged.showFixes = cliOptions.fix;
     }
 
