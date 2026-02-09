@@ -256,11 +256,13 @@ export class ConfigLoader {
     }
 
     // Handle --explain and --fix flags
-    if (cliOptions.explain !== undefined) {
+    // Only override when explicitly enabled on the CLI; this avoids
+    // Commander-style default `false` values clobbering config settings.
+    if (cliOptions.explain === true) {
       merged.showExplanations = cliOptions.explain;
     }
 
-    if (cliOptions.fix !== undefined) {
+    if (cliOptions.fix === true) {
       merged.showFixes = cliOptions.fix;
     }
 
