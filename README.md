@@ -22,11 +22,17 @@ git clone https://github.com/johsam/scry.git
 cd scry
 bun install
 bun run dev scan .
+
+bun scan examples/vulnerable-app/vulnerable-code.ts --output compact
+
+# for you to test the tool, see [commands.md](./commands.md) for a comprehensive list of all available commands and options to test, including:
 ```
 
 Or after building:
 
 ```bash
+# This assumes you have built and installed the package globally, which would expose `scry` as a command
+
 # Scan current directory
 scry scan .
 
