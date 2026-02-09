@@ -263,8 +263,6 @@ export class ConfigLoader {
     }
 
     if (cliOptions.fix === true) {
-
-    if (cliOptions.fix === true) {
       merged.showFixes = cliOptions.fix;
     }
 
@@ -274,14 +272,14 @@ export class ConfigLoader {
   /**
    * Validate output format
    */
-  private static isValidOutputFormat(format: string): format is OutputFormat {
+  private static isValidOutputFormat(format: string): boolean {
     return ['table', 'json', 'markdown', 'compact'].includes(format);
   }
 
   /**
    * Validate severity level
    */
-  private static isValidSeverity(severity: string): severity is Severity {
+  private static isValidSeverity(severity: string): boolean {
     return ['low', 'medium', 'high'].includes(severity);
   }
 
