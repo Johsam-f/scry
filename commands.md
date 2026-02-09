@@ -1,8 +1,8 @@
 # Scry CLI Commands
 
-All commands use `bun scan` with the `examples/vulnerable-app` path. for scanning the vulnerable demo app. You can replace this with any path to scan your own code.
+All commands use `bun scan` with the `examples/vulnerable-app` path for scanning the vulnerable demo app. You can replace this with any path to scan your own code.
 
-*** Note ***: `bun scan` is the command used and not `scry scan` because the CLI is built with Bun. The `scry` name is the tool's name, but the command to run it is `bun scan` as per the implementation in `src/cli/index.ts`. The idea is that once installed globally, you could run `scry scan` as an alias, but for now, the direct command is `bun scan`.
+*** Note ***: In development, you can run the CLI with `bun run dev scan ...`. The examples below use `bun scan ...`, which works because `scan` is exposed as a script in `package.json`. After building and installing the package (using the `bin` entry), you can run the installed binary directly as `scry scan ...`.
 
 
 ## Basic Commands
