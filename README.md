@@ -42,6 +42,20 @@ scry scan . --output json
 
 Note: npm package coming soon.
 
+## Testing the Tool
+
+**For you to test the Tool:** See [commands.md](./commands.md) for a comprehensive list of all available commands and options to test, including:
+
+- Single file and directory scans
+- All output formats (table, json, markdown, compact)
+- Severity filtering
+- Strict mode
+- Explanations and fixes
+- Configuration file usage
+- And much more!
+
+All example commands use `examples/vulnerable-app` as the test path.
+
 ## What scry Detects
 
 ### Security Rules
@@ -106,8 +120,17 @@ scry scan ./src
 ### Output Formats
 
 ```bash
-# Table (default) - Detailed with colors
+# Table (default) - Clean summary with findings table
 scry scan . --output table
+
+# Add detailed explanations for each finding
+scry scan . --explain
+
+# Add suggested fixes for each finding
+scry scan . --fix
+
+# Show both explanations and fixes
+scry scan . --explain --fix
 
 # Compact - Minimal, file-grouped output
 scry scan . --output compact
