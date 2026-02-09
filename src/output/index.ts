@@ -53,7 +53,7 @@ export function render(
     default:
       output = formatAsTable(findings);
       if (showSummary) {
-        output += formatSummary(findings, filesScanned, duration);
+        output += formatSummary(findings, filesScanned, duration, showExplanations, showFixes);
       }
       break;
   }

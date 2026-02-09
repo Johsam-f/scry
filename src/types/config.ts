@@ -23,6 +23,8 @@ export interface CLIOptions {
   config?: string;
   ignore?: string[];
   json?: boolean;
+  explain?: boolean;
+  fix?: boolean;
 }
 
 export const defaultConfig: ScryConfig = {
@@ -39,6 +41,6 @@ export const defaultConfig: ScryConfig = {
   output: 'table',
   strict: false,
   minSeverity: 'low',
-  showFixes: true,
-  showExplanations: true,
+  showFixes: false,
+  showExplanations: false,
 };

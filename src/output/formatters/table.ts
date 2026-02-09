@@ -45,7 +45,13 @@ function formatSeverity(severity: string): string {
   }
 }
 
-export function formatSummary(findings: Finding[], filesScanned: number, duration: number): string {
+export function formatSummary(
+  findings: Finding[],
+  filesScanned: number,
+  duration: number,
+  showExplanations: boolean = false,
+  showFixes: boolean = false
+): string {
   const high = findings.filter((f) => f.severity === 'high').length;
   const medium = findings.filter((f) => f.severity === 'medium').length;
   const low = findings.filter((f) => f.severity === 'low').length;
@@ -61,8 +67,15 @@ export function formatSummary(findings: Finding[], filesScanned: number, duratio
     `${chalk.yellow(`${logSymbols.warning} Medium: ${medium}`)}`,
     `${chalk.blue(`${logSymbols.info} Low: ${low}`)}`,
     `${chalk.bold('Total: ' + findings.length)}`,
-    '',
   ];
+
+  // Add hint about detailed flags if not already enabled and there are findings
+  if (findings.length > 0 && !showExplanations && !showFixes) {
+    lines.push('');
+    lines.push(chalk.dim('💡 Use --explain for detailed explanations or --fix for suggested fixes'));
+  }
+
+  lines.push('');
 
   return lines.join('\n');
 }

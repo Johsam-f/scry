@@ -21,6 +21,8 @@ program
   .option('--min-severity <level>', 'Minimum severity to report (low, medium, high)', 'low')
   .option('--config <path>', 'Path to config file')
   .option('--ignore <patterns...>', 'Additional patterns to ignore')
+  .option('--explain', 'Show detailed explanations for each finding')
+  .option('--fix', 'Show suggested fixes for each finding')
   .action(async (path, options) => {
     const scanPath = path || '.';
     await handleScanCommand(scanPath, {

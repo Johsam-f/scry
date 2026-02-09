@@ -255,6 +255,15 @@ export class ConfigLoader {
       merged.output = 'json';
     }
 
+    // Handle --explain and --fix flags
+    if (cliOptions.explain !== undefined) {
+      merged.showExplanations = cliOptions.explain;
+    }
+
+    if (cliOptions.fix !== undefined) {
+      merged.showFixes = cliOptions.fix;
+    }
+
     return merged;
   }
 
