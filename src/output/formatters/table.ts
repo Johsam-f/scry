@@ -72,7 +72,11 @@ export function formatSummary(
   // Add hint about detailed flags if not already enabled and there are findings
   if (findings.length > 0 && !showExplanations && !showFixes) {
     lines.push('');
-    lines.push(chalk.dim('💡 Use --explain for detailed explanations or --fix for suggested fixes'));
+    lines.push(
+      chalk.dim(
+        `${logSymbols.info} Tip: Use --explain for detailed explanations or --fix for suggested fixes`
+      )
+    );
   }
 
   lines.push('');
