@@ -45,6 +45,9 @@ scry scan ./src
 # Strict mode (exit code 1 if issues found)
 scry scan . --strict
 
+#output as compact
+scry scan . --output compact
+
 # Output as JSON
 scry scan . --output json
 
