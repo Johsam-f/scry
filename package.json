@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "scry": "dist/cli/index.js"
+    "scry": "dist/index.js"
   },
   "scripts": {
     "build": "bun build src/cli/index.ts --outdir dist --format esm --target node",

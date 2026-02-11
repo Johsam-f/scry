@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from 'commander';
 import { handleScanCommand } from './commands/scan';
 import { readFileSync } from 'fs';
