@@ -15,24 +15,27 @@
 
 ## Quick Start
 
-Clone and run from source:
+Install globally from npm:
 
 ```bash
-git clone https://github.com/johsam/scry.git
-cd scry
-bun install
-bun run dev scan .
+# Install globally
+npm install -g @johsam-f/scry
 
-bun scan examples/vulnerable-app/vulnerable-code.ts --output compact
-
-# for you to test the tool, see [commands.md](./commands.md) for a comprehensive list of all available commands and options to test, including:
+# Or use with npx (no installation required)
+npx @johsam-f/scry scan .
 ```
 
-Or after building:
+Install locally from npm:
 
 ```bash
-# This assumes you have built and installed the package globally, which would expose `scry` as a command
+#install locally
+npm install @johsam-f/scry
 
+```
+
+Basic usage:
+
+```bash
 # Scan current directory
 scry scan .
 
@@ -44,13 +47,16 @@ scry scan . --strict
 
 # Output as JSON
 scry scan . --output json
+
+# Show explanations and fixes
+scry scan . --explain --fix
 ```
 
-Note: npm package coming soon.
+See [commands.md](./commands.md) for a comprehensive list of all available commands and options.
 
-## Testing the Tool
+## Command Reference
 
-**For you to test the Tool:** See [commands.md](./commands.md) for a comprehensive list of all available commands and options to test, including:
+See [commands.md](./commands.md) for a comprehensive list of all available commands and options, including:
 
 - Single file and directory scans
 - All output formats (table, json, markdown, compact)
@@ -59,8 +65,6 @@ Note: npm package coming soon.
 - Explanations and fixes
 - Configuration file usage
 - And much more!
-
-All example commands use `examples/vulnerable-app` as the test path.
 
 ## What scry Detects
 
@@ -99,17 +103,27 @@ Total:   12
 
 ## Installation
 
+### For End Users
+
 ```bash
-# From source
-git clone https://github.com/johsam/scry.git
+# Install globally
+npm install -g @johsam-f/scry
+
+# Or use with npx (no installation required)
+npx @johsam-f/scry scan .
+```
+
+### For Development
+
+```bash
+# Clone and run from source
+git clone https://github.com/johsam-f/scry.git
 cd scry
 bun install
 bun run dev scan .
-
-# From npm (coming soon)
-npm install -g scry
-scry scan .
 ```
+
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for development commands and testing instructions.
 
 ## Usage
 
