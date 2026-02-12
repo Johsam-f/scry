@@ -238,9 +238,7 @@ For more detailed information, see:
 
 - [Installation Guide](docs/INSTALLATION_GUIDE.md) - Setup and configuration
 - [Security Rules Guide](docs/SECURITY_RULES_GUIDE.md) - Detailed rule documentation
-- [Copilot Impact](docs/COPILOT_IMPACT.md) - How GitHub Copilot CLI enhanced development
 - [Configuration Reference](docs/configuration.md) - Configuration file options
-- [Implementation Guide](docs/IMPLEMENTATION_GUIDE.md) - Architecture and development
 
 ## Contributing
 
@@ -259,7 +257,7 @@ MIT
 
 ## Built for the GitHub Copilot CLI Challenge
 
-This project was created for the [GitHub Copilot CLI Challenge](https://dev.to/challenges/github-2026-01-21) and demonstrates how GitHub Copilot CLI can accelerate security tool development.
+This project was created for the [GitHub Copilot CLI Challenge](https://dev.to/challenges/github-2026-01-21) and demonstrates how GitHub Copilot CLI can accelerate development.
 
 **Key Achievement Highlights:**
 
