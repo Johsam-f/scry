@@ -313,10 +313,10 @@ Create dated security audit reports.
 
 | Format   | Human-Readable | Machine-Readable | Size | Use Case |
 |----------|----------------|------------------|------|----------|
-| Table    | ✅ Excellent   | ❌ No           | Large | Development, auditing |
-| JSON     | ❌ Poor        | ✅ Excellent    | Medium | CI/CD, automation |
-| Markdown | ✅ Good        | ⚠️ Partial      | Large | Documentation, reports |
-| Compact  | ✅ Good        | ❌ No           | Small | Quick scans, terminals |
+| Table    | [+] Excellent   | [x] No           | Large | Development, auditing |
+| JSON     | [x] Poor        | [+] Excellent    | Medium | CI/CD, automation |
+| Markdown | [+] Good        | [!] Partial      | Large | Documentation, reports |
+| Compact  | [+] Good        | [x] No           | Small | Quick scans, terminals |
 
 ## Tips
 

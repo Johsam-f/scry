@@ -21,16 +21,16 @@ Complete reference for all security rules implemented in scry.
 ### What to Detect
 
 ```javascript
-// ❌ BAD - Hardcoded API key
+//[ BAD ] - Hardcoded API key
 const API_KEY = "sk_live_1234567890abcdef";
 
-// ❌ BAD - Hardcoded password
+//[ BAD ] - Hardcoded password
 const DB_PASSWORD = "mySecretPassword123";
 
-// ❌ BAD - AWS credentials
+//[ BAD ] - AWS credentials
 const AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE";
 
-// ❌ BAD - Private key
+//[ BAD ] - Private key
 const PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----...";
 ```
 
@@ -64,14 +64,14 @@ Hardcoded secrets can be:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Use environment variables
+// GOOD - Use environment variables
 const API_KEY = process.env.API_KEY;
 
-// ✅ GOOD - Use a secrets manager
+// GOOD - Use a secrets manager
 import { getSecret } from "./secrets";
 const API_KEY = await getSecret("api-key");
 
-// ✅ GOOD - Use config files (not in git)
+// GOOD - Use config files (not in git)
 const config = require("./config.json"); // Add to .gitignore
 const API_KEY = config.apiKey;
 ```
@@ -85,12 +85,12 @@ const API_KEY = config.apiKey;
 ### What to Detect
 
 ```javascript
-// ❌ BAD - JWT in localStorage
+//[ BAD ] - JWT in localStorage
 localStorage.setItem("token", jwtToken);
 localStorage.setItem("jwt", response.token);
 localStorage.getItem("authToken");
 
-// ❌ BAD - JWT in sessionStorage
+//[ BAD ] - JWT in sessionStorage
 sessionStorage.setItem("token", jwtToken);
 ```
 
@@ -112,7 +112,7 @@ localStorage is vulnerable to XSS attacks:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Use httpOnly cookies
+// GOOD - Use httpOnly cookies
 // Backend sets cookie:
 res.cookie("token", jwtToken, {
   httpOnly: true, // Not accessible via JavaScript
@@ -120,10 +120,10 @@ res.cookie("token", jwtToken, {
   sameSite: "strict", // CSRF protection
 });
 
-// ✅ GOOD - Store in memory (for SPAs)
+// GOOD - Store in memory (for SPAs)
 let authToken = null; // In-memory, lost on refresh
 
-// ✅ GOOD - Use secure session storage with encryption
+// GOOD - Use secure session storage with encryption
 import { encryptToken } from "./crypto";
 const encrypted = encryptToken(token);
 sessionStorage.setItem("token", encrypted);
@@ -138,13 +138,13 @@ sessionStorage.setItem("token", encrypted);
 ### What to Detect
 
 ```javascript
-// ❌ BAD - Missing security flags
+//[ BAD ] - Missing security flags
 res.cookie("session", sessionId);
 
-// ❌ BAD - No httpOnly
+//[ BAD ] - No httpOnly
 res.cookie("token", token, { secure: true });
 
-// ❌ BAD - No sameSite
+//[ BAD ] - No sameSite
 document.cookie = "user=john";
 ```
 
@@ -166,7 +166,7 @@ Missing flags expose cookies to:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - All security flags
+// GOOD - All security flags
 res.cookie("session", sessionId, {
   httpOnly: true, // Prevent JavaScript access
   secure: true, // HTTPS only
@@ -174,7 +174,7 @@ res.cookie("session", sessionId, {
   maxAge: 3600000, // 1 hour expiry
 });
 
-// ✅ GOOD - Production-ready
+// GOOD - Production-ready
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
@@ -193,16 +193,16 @@ res.cookie("auth", token, cookieOptions);
 ### What to Detect
 
 ```javascript
-// ❌ BAD - Direct eval
+//[ BAD ] - Direct eval
 eval(userInput);
 
-// ❌ BAD - Function constructor
+//[ BAD ]  - Function constructor
 new Function(code)();
 
-// ❌ BAD - setTimeout with string
+//[ BAD ] - setTimeout with string
 setTimeout("doSomething()", 1000);
 
-// ❌ BAD - setInterval with string
+//[ BAD ] - setInterval with string
 setInterval("update()", 5000);
 ```
 
@@ -226,20 +226,20 @@ setInterval("update()", 5000);
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Use JSON.parse for data
+// GOOD - Use JSON.parse for data
 const data = JSON.parse(jsonString);
 
-// ✅ GOOD - Use proper function references
+// GOOD - Use proper function references
 setTimeout(doSomething, 1000);
 
-// ✅ GOOD - Use operators/expressions
+// GOOD - Use operators/expressions
 const operators = {
   "+": (a, b) => a + b,
   "-": (a, b) => a - b,
 };
 const result = operators[op](x, y);
 
-// ✅ GOOD - Use a safe expression parser
+// GOOD - Use a safe expression parser
 import { parse } from "safe-expression-parser";
 const result = parse(expression);
 ```
@@ -253,7 +253,7 @@ const result = parse(expression);
 ### What to Detect
 
 ```javascript
-// ❌ BAD - Wildcard with credentials
+//[ BAD ] - Wildcard with credentials
 app.use(
   cors({
     origin: "*",
@@ -261,10 +261,10 @@ app.use(
   }),
 );
 
-// ❌ BAD - Unrestricted access
+//[ BAD ] - Unrestricted access
 res.setHeader("Access-Control-Allow-Origin", "*");
 
-// ❌ BAD - Reflecting origin without validation
+//[ BAD ] - Reflecting origin without validation
 res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
 ```
 
@@ -286,7 +286,7 @@ Overly permissive CORS allows:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Specific origins
+// GOOD - Specific origins
 app.use(
   cors({
     origin: "https://trusted-domain.com",
@@ -294,7 +294,7 @@ app.use(
   }),
 );
 
-// ✅ GOOD - Whitelist multiple origins
+// GOOD - Whitelist multiple origins
 const allowedOrigins = ["https://app.example.com", "https://admin.example.com"];
 
 app.use(
@@ -325,11 +325,11 @@ app.use(
 - `.env` example without placeholders
 
 ```javascript
-// ❌ BAD - Logging env vars
+//[ BAD ] - Logging env vars
 console.log(process.env);
 console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
 
-// ❌ BAD - Exposing in error messages
+//[ BAD ] - Exposing in error messages
 throw new Error(`Failed with key: ${process.env.API_KEY}`);
 ```
 
@@ -352,25 +352,25 @@ Exposed `.env` files leak:
 ### How to Fix
 
 ```bash
-# ✅ GOOD - Add to .gitignore
+# GOOD - Add to .gitignore
 echo ".env" >> .gitignore
 echo ".env.local" >> .gitignore
 echo ".env.*.local" >> .gitignore
 
-# ✅ GOOD - Remove from git history
+# GOOD - Remove from git history
 git rm --cached .env
 git commit -m "Remove .env from tracking"
 ```
 
 ```javascript
-// ✅ GOOD - Don't log env vars
+// GOOD - Don't log env vars
 // Redact sensitive values
 const sanitized = { ...process.env };
 delete sanitized.DB_PASSWORD;
 delete sanitized.API_KEY;
 console.log(sanitized);
 
-// ✅ GOOD - Create .env.example with placeholders
+// GOOD - Create .env.example with placeholders
 // .env.example
 DB_HOST = localhost;
 DB_PASSWORD = your_password_here;
@@ -386,16 +386,16 @@ API_KEY = your_api_key_here;
 ### What to Detect
 
 ```javascript
-// ❌ BAD - MD5 hashing
+//[ BAD ] - MD5 hashing
 crypto.createHash("md5");
 
-// ❌ BAD - SHA1 hashing
+//[ BAD ] - SHA1 hashing
 crypto.createHash("sha1");
 
-// ❌ BAD - Weak password hashing
+//[ BAD ] - Weak password hashing
 const hash = md5(password);
 
-// ❌ BAD - No salt
+//[ BAD ] - No salt
 const hash = crypto.createHash("sha256").update(password).digest("hex");
 ```
 
@@ -419,21 +419,21 @@ Weak crypto algorithms:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Use bcrypt for passwords
+// GOOD - Use bcrypt for passwords
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 const hash = await bcrypt.hash(password, saltRounds);
 const isValid = await bcrypt.compare(password, hash);
 
-// ✅ GOOD - Use SHA-256 for checksums (not passwords)
+// GOOD - Use SHA-256 for checksums (not passwords)
 const hash = crypto.createHash("sha256").update(data).digest("hex");
 
-// ✅ GOOD - Use argon2 (modern alternative)
+// GOOD - Use argon2 (modern alternative)
 import argon2 from "argon2";
 const hash = await argon2.hash(password);
 const isValid = await argon2.verify(hash, password);
 
-// ✅ GOOD - Use PBKDF2 with salt
+// GOOD - Use PBKDF2 with salt
 const salt = crypto.randomBytes(16);
 const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512");
 ```
@@ -447,17 +447,17 @@ const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512");
 ### What to Detect
 
 ```javascript
-// ❌ BAD - Weak password requirements
+//[ BAD ] - Weak password requirements
 if (password.length < 6) return false;
 
-// ❌ BAD - Storing plain text passwords
+//[ BAD ] - Storing plain text passwords
 db.save({ password: password });
 
-// ❌ BAD - Comparing passwords directly
+//[ BAD ] - Comparing passwords directly
 if (password === storedPassword)
   // ...
 
-  // ❌ BAD - Password in URL/query params
+  //[ BAD ] - Password in URL/query params
   fetch(`/login?password=${password}`);
 ```
 
@@ -480,7 +480,7 @@ Poor password handling leads to:
 ### How to Fix
 
 ```javascript
-// ✅ GOOD - Strong password requirements
+// GOOD - Strong password requirements
 function isPasswordStrong(password) {
   return (
     password.length >= 12 &&
@@ -491,15 +491,15 @@ function isPasswordStrong(password) {
   );
 }
 
-// ✅ GOOD - Hash before storing
+// GOOD - Hash before storing
 import bcrypt from "bcrypt";
 const hash = await bcrypt.hash(password, 10);
 db.save({ passwordHash: hash });
 
-// ✅ GOOD - Secure comparison
+// GOOD - Secure comparison
 const isValid = await bcrypt.compare(password, user.passwordHash);
 
-// ✅ GOOD - Send in POST body, never URL
+// GOOD - Send in POST body, never URL
 fetch("/login", {
   method: "POST",
   body: JSON.stringify({ password }),
@@ -529,13 +529,13 @@ For each rule, create test fixtures:
 ```
 tests/fixtures/
 ├── hardcoded-secrets/
-│   ├── with-aws-key.js       ❌ Should find
-│   ├── with-env-var.js       ✅ Should pass
-│   └── with-comment.js       ✅ Should pass
+│   ├── with-aws-key.js       [x] Should find
+│   ├── with-env-var.js       [+] Should pass
+│   └── with-comment.js       [+] Should pass
 ├── jwt-storage/
-│   ├── localstorage-jwt.js   ❌ Should find
-│   ├── cookie-jwt.js         ✅ Should pass
-│   └── memory-jwt.js         ✅ Should pass
+│   ├── localstorage-jwt.js   [x] Should find
+│   ├── cookie-jwt.js         [+] Should pass
+│   └── memory-jwt.js         [+] Should pass
 ...
 ```
 

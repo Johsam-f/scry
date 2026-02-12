@@ -15,16 +15,22 @@ A comprehensive guide to installing and setting up scry on your system.
 
 ## Installation Methods
 
-### Method 1: From npm (Coming Soon)
+### Method 1: From npm
 
 ```bash
-npm install -g scry
+npm install -g @johsam-f/scry
+```
+
+locally:
+
+```bash
+npm install @johsam-f/scry
 ```
 
 Or with yarn:
 
 ```bash
-yarn global add scry
+yarn global add @johsam-f/scry
 ```
 
 ### Method 2: From Source (Current)
@@ -195,7 +201,7 @@ Expected output should show:
 ### NPM Package
 
 ```bash
-npm uninstall -g scry
+npm uninstall -g @johsam-f/scry
 ```
 
 ### Source Installation
@@ -244,158 +250,6 @@ bun install
 
 ```bash
 scry scan . --ignore "**/node_modules/**" --max-file-size 1000000
-```
-
----
-
-## Environment-Specific Setup
-
-### macOS
-
-```bash
-# Using Homebrew (if available)
-brew install scry
-
-# Or from source
-git clone https://github.com/johsam/scry.git
-cd scry
-bun install
-bun link  # Creates symlink in /usr/local/bin
-```
-
-### Linux
-
-```bash
-# Using package manager (if available)
-apt-get install scry
-
-# Or from source
-git clone https://github.com/johsam/scry.git
-cd scry
-bun install
-sudo bun link  # May need sudo for system-wide installation
-```
-
-### Windows
-
-```bash
-# Using npm
-npm install -g scry
-
-# Or from source
-git clone https://github.com/johsam/scry.git
-cd scry
-bun install
-bun link
-```
-
----
-
-## Using scry in CI/CD
-
-### GitHub Actions
-
-```yaml
-name: Security Scan
-
-on: [push, pull_request]
-
-jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: oven-sh/setup-bun@v1
-
-      - name: Install scry
-        run: bun install -g scry
-
-      - name: Run security scan
-        run: scry scan . --output json --strict
-```
-
-### GitLab CI
-
-```yaml
-security_scan:
-  image: oven/bun:latest
-  script:
-    - bun install -g scry
-    - scry scan . --output json --strict
-```
-
-### Jenkins
-
-```groovy
-pipeline {
-  stages {
-    stage('Security Scan') {
-      steps {
-        sh 'npm install -g scry'
-        sh 'scry scan . --output json > results.json'
-        junit 'results.json'
-      }
-    }
-  }
-}
-```
-
----
-
-## Integration with IDEs
-
-### VS Code
-
-Install the VS Code extension (coming soon):
-
-```bash
-code --install-extension scry-extension
-```
-
-Configuration in `.vscode/settings.json`:
-
-```json
-{
-  "scry.enable": true,
-  "scry.strictMode": true,
-  "scry.minSeverity": "medium",
-  "scry.onSave": true
-}
-```
-
-### WebStorm / IntelliJ
-
-Configure as external tool:
-
-- Program: `scry`
-- Arguments: `scan $ProjectFileDir$ --output json`
-- Output format: JSON
-- Working directory: `$ProjectFileDir$`
-
----
-
-## Performance Tuning
-
-### For Large Codebases
-
-```bash
-# Skip node_modules and common directories
-scry scan . \
-  --ignore "**/node_modules/**" \
-  --ignore "**/dist/**" \
-  --ignore "**/.git/**" \
-  --ignore "**/coverage/**" \
-  --max-file-size 5000000
-```
-
-### For Faster Scanning
-
-```bash
-# Minimal output, no explanations
-scry scan . \
-  --output compact \
-  --no-explanations \
-  --min-severity medium
 ```
 
 ---
