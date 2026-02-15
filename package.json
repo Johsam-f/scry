@@ -1,6 +1,6 @@
 {
   "name": "@johsam-f/scry",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Security-focused CLI that reveals hidden risks in JavaScript and Node.js codebases",
   "type": "module",
   "main": "dist/index.js",
